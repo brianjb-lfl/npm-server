@@ -62,6 +62,7 @@ epHelp.buildUsersFull = function() {
           links: tempUsrLinks.slice(),
           skills: tempUsrSkills.slice()
         });
+        delete tempUsr['password'];
         usrsArr.push(tempUsr);
       });
       return usrsArr;
