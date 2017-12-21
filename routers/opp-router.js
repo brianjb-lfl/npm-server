@@ -7,6 +7,7 @@ const oppRouter = express.Router();
 const { epHelp } = require('./router-helpers');
 const bodyParser = require('body-parser');
 const jsonParser = bodyParser.json();
+let resArr = [];
 
 process.stdout.write('\x1Bc');
 
@@ -33,29 +34,16 @@ oppRouter.get('/list', (req, res) => {
       + "end as user_string";
   return knex('opportunities')
     .join('users', 'opportunities.id_user', '=', 'users.id')
-    .select(
-      'opportunities.id',
-      'users.id',
-      'opportunity_type as opportunityType',
-      'users.username',
-      'opportunities.id_user',
-      'offer',
-      'title',
-      'narrative',
-      'timestamp_start',
-      'timestamp_end',
-      'opportunities.location_city',
-      'opportunities.location_state',
-      'opportunities.location_country',
-      'id_user',
-      'link',
-      knex.raw(calcUserField)
-    )
-    .orderBy('user_string')
+    .select()
     .orderBy('timestamp_start')
     .debug(false)
     .then( results => {
-      res.json(results);
+      results.forEach ( opp => {
+        console.log(opp);
+        resArr.push(epHelp.convertCase(opp, 'snakeToCC'));
+        console.log(resArr);
+      });
+      res.json(resArr);
     })
     .catch( err => {
       res.status(500).json({message: 'Internal server error'});
