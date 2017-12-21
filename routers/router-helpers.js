@@ -46,10 +46,7 @@ epHelp.buildUsersFull = function() {
       results.forEach( usr => {
         let tempUsrCauses = uCauses
           .filter( cause => cause.id_user === usr.id)
-          .map( cause => Object.assign( {}, {
-            id: cause.id,
-            cause: cause.cause
-          }));
+          .map( cause => cause.cause);
         let tempUsrLinks = uLinks
           .filter( link => link.id_user === usr.id)
           .map( link => Object.assign( {}, {
@@ -59,10 +56,7 @@ epHelp.buildUsersFull = function() {
           }));
         let tempUsrSkills = uSkills
           .filter( skill => skill.id_user === usr.id)
-          .map( skill => Object.assign( {}, {
-            id: skill.id,
-            skill: skill.skill
-          }));
+          .map( skill => skill.skill);
         let tempUsr = Object.assign( {}, this.convertCase(usr, 'snakeToCC'), {
           causes: tempUsrCauses.slice(),
           links: tempUsrLinks.slice(),
@@ -102,7 +96,7 @@ epHelp.buildUser = function (userId) {
     })
 
     .then( results => {
-      usrObj.causes = results;
+      usrObj.causes = results.map( cause => cause.cause );
       // get user skills
       return knex('users_skills')
         .join('skills', 'users_skills.id_skill', '=', 'skills.id')
@@ -111,7 +105,7 @@ epHelp.buildUser = function (userId) {
     })
 
     .then( results => {
-      usrObj.skills = results;
+      usrObj.skills = results.map( skill => skill.skill );
       return usrObj;
     })
 
