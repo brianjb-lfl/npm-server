@@ -2,6 +2,78 @@
 
 let epHelp = {};
 
+epHelp.buildUsersFull = function() {
+  let usrsArr = [];
+  let uCauses = [];
+  let uLinks = [];
+  let uSkills = [];
+  const knex = require('../db');
+
+  // get user causes
+  return knex('users_causes')
+    .join('causes', 'users_causes.id_cause', '=', 'causes.id')
+    .select('users_causes.id_user', 'causes.id', 'causes.cause')
+    .orderBy('users_causes.id_user')
+    .then(results => {
+      uCauses = results.slice();
+    })
+    .then( () => {
+      // get user links
+      return knex('links')
+        .select('id_user', 'id', 'link_type as linkType', 'link_url as linkUrl')
+        .orderBy('id_user');
+    })
+    .then( results => {
+      uLinks = results.slice();
+    })
+    .then( () => {
+      // get user skills
+      return knex('users_skills')
+        .join('skills', 'users_skills.id_skill', '=', 'skills.id')
+        .select('users_skills.id_user', 'skills.id', 'skills.skill')
+        .orderBy('users_skills.id_user');
+    })
+    .then( results => {
+      uSkills = results.slice();
+    })
+    .then( () => {
+      // get users
+      return knex('users')
+        .select()
+        .orderBy('id');
+    })
+    .then( results => {
+      results.forEach( usr => {
+        let tempUsrCauses = uCauses
+          .filter( cause => cause.id_user === usr.id)
+          .map( cause => Object.assign( {}, {
+            id: cause.id,
+            cause: cause.cause
+          }));
+        let tempUsrLinks = uLinks
+          .filter( link => link.id_user === usr.id)
+          .map( link => Object.assign( {}, {
+            id: link.id,
+            linkType: link.linkType,
+            linkUrl: link.linkUrl
+          }));
+        let tempUsrSkills = uSkills
+          .filter( skill => skill.id_user === usr.id)
+          .map( skill => Object.assign( {}, {
+            id: skill.id,
+            skill: skill.skill
+          }));
+        let tempUsr = Object.assign( {}, this.convertCase(usr, 'snakeToCC'), {
+          causes: tempUsrCauses.slice(),
+          links: tempUsrLinks.slice(),
+          skills: tempUsrSkills.slice()
+        });
+        usrsArr.push(tempUsr);
+      });
+      return usrsArr;
+    });
+};
+
 epHelp.buildUser = function (userId) {
 
   let usrObj = {};
@@ -195,10 +267,10 @@ epHelp.convertCase = function(caseObj, mode) {
       });
       delete caseObj[key];
     }
-  })
+  });
 
-  return caseObj
+  return caseObj;
 
-}
+};
 
 module.exports = { epHelp };
