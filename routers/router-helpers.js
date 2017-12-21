@@ -204,7 +204,7 @@ epHelp.buildOpp = function(inOppId) {
     })
     .then( result => {
       oppObj = epHelp.convertCase(result[0], 'snakeToCC');
-      return getOrg(oppObj.userId);
+      return this.getOrg(oppObj.userId);
     })
     .then( result => {
       resObj = Object.assign( {}, oppObj, {
@@ -215,7 +215,7 @@ epHelp.buildOpp = function(inOppId) {
     });
 };
 
-function getOrg(inUsrId) {
+epHelp.getOrg = function(inUsrId) {
   const knex = require('../db');
   return knex('users')
     .select('organization')
@@ -223,7 +223,7 @@ function getOrg(inUsrId) {
     .then( result => {
       return (result[0].organization);
     });
-}
+};
 
 epHelp.buildOppBase = function(inOppObj) {
 

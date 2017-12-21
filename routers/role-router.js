@@ -17,6 +17,8 @@ roleRouter.get('/testify/', (req, res) => {
 roleRouter.post('/', jsonParser, (req, res) => {
   const knex = require('../db');
   let rolePostObj = {};
+  let retObj = {};
+  let orgName;
 
   // validate capability
   const capabilityOpts = ['admin', 'following'];
@@ -29,15 +31,24 @@ roleRouter.post('/', jsonParser, (req, res) => {
   }
 
   rolePostObj = epHelp.convertCase(req.body, 'ccToSnake');
-  return knex('roles')
-    .insert(rolePostObj)
-    .returning ([
-      'id',
-      'id_user_adding as idUserAdding',
-      'id_user_receiving as idUserReceiving',
-      'capabilities'])
-    .then( results => {
-      res.json(results);
+  let orgId = rolePostObj.capabilities === 'admin' ? 
+    rolePostObj.id_user_adding : rolePostObj.id_user_receiving;
+  return epHelp.getOrg(orgId)
+    .then( org => {
+      orgName = org;
+      return knex('roles')
+        .insert(rolePostObj)
+        .returning ([
+          'id',
+          'id_user_adding as idUserAdding',
+          'id_user_receiving as idUserReceiving',
+          'capabilities']);
+    })
+    .then( result => {
+      retObj = Object.assign( {}, result[0], {
+        organization: orgName
+      });
+      res.json(retObj);
     })
     .catch( err => {
       if(err.reason === 'ValidationError') {
@@ -50,27 +61,42 @@ roleRouter.post('/', jsonParser, (req, res) => {
 // PUT api/roles/:id
 roleRouter.put('/:id', jsonParser, (req, res) => {
   const knex = require('../db');
-  let rolePostObj = {};
+  const roleId = req.params.id;
+  let rolePutObj = {};
+  let retObj = {};
+  let orgName;
 
   // validate capability
-  if(req.body.capabilities) {
-    const capabilityOpts = ['admin', 'following'];
-    if(!(capabilityOpts.includes(req.body.capabilities))) {
-      return res.status(422).json({
-        code: 422,
-        reason: 'ValidationError',
-        message: 'Error: unrecognized capability spec'
-      });
-    }
+  const capabilityOpts = ['admin', 'following'];
+  if(!(capabilityOpts.includes(req.body.capabilities))) {
+    return res.status(422).json({
+      code: 422,
+      reason: 'ValidationError',
+      message: 'Error: unrecognized capability spec'
+    });
   }
 
-  rolePostObj = epHelp.convertCase(req.body, 'ccToSnake');
-  return knex('roles')
-    .where('id', '=', req.params.id)
-    .update(rolePostObj)
-    .returning (['id', 'id_user_adding as idUserAdding', 'id_user_receiving as idUserReceiving', 'capabilities'])
-    .then( results => {
-      res.json(results);
+  rolePutObj = epHelp.convertCase(req.body, 'ccToSnake');
+  let orgId = rolePutObj.capabilities === 'admin' ? 
+    rolePutObj.id_user_adding : rolePutObj.id_user_receiving;
+  return epHelp.getOrg(orgId)
+    .then( org => {
+      orgName = org;
+      console.log(orgName);
+      return knex('roles')
+        .where('id', '=', roleId)
+        .update(rolePutObj)
+        .returning ([
+          'id',
+          'id_user_adding as idUserAdding',
+          'id_user_receiving as idUserReceiving',
+          'capabilities']);
+    })
+    .then( result => {
+      retObj = Object.assign( {}, result[0], {
+        organization: orgName
+      });
+      res.json(retObj);
     })
     .catch( err => {
       if(err.reason === 'ValidationError') {
