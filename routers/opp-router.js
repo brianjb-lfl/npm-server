@@ -35,6 +35,18 @@ oppRouter.get('/list', (req, res) => {
     });
 });
 
+//GET api/opportunities/:id
+oppRouter.get('/:id', (req, res) => {
+  
+  return epHelp.buildOpp(req.params.id)
+    .then( results => {
+      res.json(results);
+    })
+    .catch( err => {
+      res.status(500).json({message: 'Internal server error'});
+    });
+});
+
 // POST api/opportunities
 oppRouter.post('/', jsonParser, (req, res) => {
   let oppId;
