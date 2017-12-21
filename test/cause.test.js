@@ -1,7 +1,7 @@
 'use strict';
 
 const path = require('path');
-const dotEnvPath = path.resolve('../../.env');
+const dotEnvPath = path.resolve('../.env');
 require('dotenv').config({path: dotEnvPath});
 
 const { setDbMode } = require('../config');
