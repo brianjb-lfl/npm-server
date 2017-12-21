@@ -128,6 +128,9 @@ userRouter.put('/:id', jsonParser, (req, res) => {
   let causePostArr = [];
   let skillsArr = req.body.skills.length > 0 ? req.body.skills.slice() : [] ;
   let skillPostArr = [];
+  // console.log(linksArr);
+  // console.log(causesArr);
+  // console.log(skillsArr);
 
   // verify id
   return knex('users')
@@ -141,8 +144,9 @@ userRouter.put('/:id', jsonParser, (req, res) => {
           message: 'User id not found.',
         });
       }
-    })    // user exists, update info
+    })    
     
+    // user exists, update info
     .then( () => {
       // get hashed pw
       convInUsrObj = epHelp.convertCase(inUsrObj, 'ccToSnake');
@@ -164,6 +168,7 @@ userRouter.put('/:id', jsonParser, (req, res) => {
       delete convInUsrObj.links;
       delete convInUsrObj.causes;
       delete convInUsrObj.skills;
+      console.log(convInUsrObj);
       return knex('users')
         .where('id', '=', usrId)
         .update(convInUsrObj)
@@ -263,11 +268,9 @@ userRouter.put('/:id', jsonParser, (req, res) => {
         });
     })
     .then( () => {
-      console.log('retObj before', retObj);
-      return epHelp.buildUser(retObj[0].id);
+      return epHelp.buildUser(usrId);
     })
-    .then( (retObj) => {
-      console.log('retObj after', retObj);
+    .then( retObj => {
       let usrObjCC = epHelp.convertCase(retObj, 'snakeToCC');
       res.status(201).json(usrObjCC);
     })
