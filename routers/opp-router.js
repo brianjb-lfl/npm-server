@@ -7,6 +7,7 @@ const oppRouter = express.Router();
 const { epHelp } = require('./router-helpers');
 const bodyParser = require('body-parser');
 const jsonParser = bodyParser.json();
+let causeArr = [];
 let resArr = [];
 
 process.stdout.write('\x1Bc');
@@ -27,27 +28,41 @@ oppRouter.get('/testify/secure', jwtAuth, (req, res) => {
 //GET api/opportunities/list
 oppRouter.get('/list', (req, res) => {
   const knex = require('../db');
-  const calcUserField = 
-    "case when users.organization isnull then "
-      + "users.last_name || ', '  || users.first_name "
-      + "else users.organization "
-      + "end as user_string";
-  return knex('opportunities')
-    .join('users', 'opportunities.id_user', '=', 'users.id')
-    .select()
-    .orderBy('timestamp_start')
-    .debug(false)
-    .then( results => {
-      results.forEach ( opp => {
-        console.log(opp);
-        resArr.push(epHelp.convertCase(opp, 'snakeToCC'));
-        console.log(resArr);
-      });
-      res.json(resArr);
-    })
-    .catch( err => {
-      res.status(500).json({message: 'Internal server error'});
-    });    
+  //const calcUserField = 
+  // "case when users.organization isnull then "
+  //   + "users.last_name || ', '  || users.first_name "
+  //   + "else users.organization "
+  //   + "end as user_string";
+  return knex('opportunities_causes')
+    .join('causes', 'opportunities_causes.id_cause', '=', 'causes.id')
+    .select('causes.id', 'opportunities_causes.id_opp', 'causes.cause')
+    .orderBy('causes.cause')
+    .then( results => causeArr = results.slice())
+    .then( () => {
+      return knex('opportunities')
+        .join('users', 'opportunities.id_user', '=', 'users.id')
+        .select()
+        .orderBy('timestamp_start')
+        .debug(false)
+        .then( results => {
+          results.forEach ( opp => {
+            const tempCauses = causeArr
+              .filter( cause => cause.id_opp === opp.id)
+              .map( cause => cause.cause);
+            console.log(opp);
+            let tempOpp = epHelp.convertCase(opp, 'snakeToCC');
+            tempOpp = Object.assign( {}, tempOpp, {
+              causes: tempCauses
+            });
+            resArr.push(tempOpp);
+            console.log(resArr);
+          });
+          res.json(resArr);
+        })
+        .catch( err => {
+          res.status(500).json({message: 'Internal server error'});
+        });
+    });
 });
 
 // POST api/opportunities
