@@ -1,0 +1,14 @@
+language: node_js
+node_js: node
+services:
+  - postgresql
+deploy:
+  provider: heroku
+  api_key:
+    secure: ISxch8lNKy1Hjdieumi+R3DuP3HYqvGmyVDAD5HhYtnoXTaioUY377klWLvtHswC+ds/nWE90trU2eSg58PM7PGLtXJLsV/Z7RkLIy10FSLUsag2fYDUuu7bEFcTZBAAgQYFWCx9CvOGs4B3LdkBiPNWyIu3Fi7KJUxp0+udC5qjhZmkC11HdKDxKFiokk7RVtxMtdn01Hk3jsosbjrMo/f1dKw1MK58EQgywJFtawSXysB545w//RESZOHegwPv5q7G4Gt6qmRTAROQvNRLh6HkSn1nMqVulKsL+LjnYXxW8NQBj79zmfZB3tmMHvxZO96OGkya4AK6zA6szA8XnQMjx1sxs6lI5tzx0H+7ps7unHBqKur11I3Snuh18+w0n0Wrg3Zv6b8wNlMfvk+Rt6KbpR3mEE2m4O6Lvr2wqXmyal661LEchHtj06TqsrYAUSPuhJi8SvIUZE9O+oOjacAyrb940Ro9Mjkb0ay7D9cG0h8FAXeyyM+MKTnfDu2bloQoqAmfTKrPfON585DJ8oAPga7/hYdcnt4KXHF0Z1euV6ARr4qqBKjzOmODDY/MlIzUlRbSEqb0Ms1EkWsyRyk48hAOMCtpJkHwIDG+HJCKD7lKOLCkHtKsScLxBbVucD6jBnFYESt4gwtMogWlbcZ6bdGlMDory9JsPseEfgM=
+  app: arcane-journey-50164
+  on:
+    repo: brianjb-lfl/npmatch
+env:
+  - SERVER_DIR=server
+  - CLIENT_DIR=client
