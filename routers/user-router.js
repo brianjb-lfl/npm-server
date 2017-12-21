@@ -122,11 +122,11 @@ userRouter.put('/:id', jsonParser, (req, res) => {
   let inUsrObj = Object.assign( {}, req.body);
   let convInUsrObj = {};
   let retObj = {};
-  let linksArr = typeof req.body.links === 'object' ? req.body.links.slice() : [] ;
+  let linksArr = req.body.links.length > 0 ? req.body.links.slice() : [] ;
   let linkPostArr = [];
-  let causesArr = typeof req.body.causes === 'object' ? req.body.causes.slice() : [] ;
+  let causesArr = req.body.causes.length > 0 ? req.body.causes.slice() : [] ;
   let causePostArr = [];
-  let skillsArr = typeof req.body.skills === 'object' ? req.body.skills.slice() : [] ;
+  let skillsArr = req.body.skills.length > 0 ? req.body.skills.slice() : [] ;
   let skillPostArr = [];
 
   // verify id
@@ -170,8 +170,7 @@ userRouter.put('/:id', jsonParser, (req, res) => {
         .returning(['id', 'username']);
     })
 
-    .then( result => {
-      retObj = result;
+    .then( () => {
       // process links
       return knex('links')
         .where('id_user', '=', usrId)
@@ -188,7 +187,7 @@ userRouter.put('/:id', jsonParser, (req, res) => {
               );
             });
             return knex('links')
-              .insert(linkPostArr)
+              .insert(linkPostArr);
           }
           else {
             return;
@@ -204,7 +203,7 @@ userRouter.put('/:id', jsonParser, (req, res) => {
         .then( () => {
           if(causesArr.length > 0) {
             return knex('causes')
-              .select('id', 'cause')
+              .select('id', 'cause');
           }
           else {
             return;
@@ -222,7 +221,7 @@ userRouter.put('/:id', jsonParser, (req, res) => {
               );
             });
             return knex('users_causes')
-              .insert(causePostArr)
+              .insert(causePostArr);
           }
           else {
             return;
@@ -238,7 +237,7 @@ userRouter.put('/:id', jsonParser, (req, res) => {
         .then( () => {
           if(skillsArr.length > 0) {
             return knex('skills')
-              .select('id', 'skill')
+              .select('id', 'skill');
           }
           else {
             return;
