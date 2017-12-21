@@ -128,9 +128,7 @@ userRouter.put('/:id', jsonParser, (req, res) => {
   let causePostArr = [];
   let skillsArr = req.body.skills.length > 0 ? req.body.skills.slice() : [] ;
   let skillPostArr = [];
-  // console.log(linksArr);
-  // console.log(causesArr);
-  // console.log(skillsArr);
+
 
   // verify id
   return knex('users')
@@ -168,7 +166,6 @@ userRouter.put('/:id', jsonParser, (req, res) => {
       delete convInUsrObj.links;
       delete convInUsrObj.causes;
       delete convInUsrObj.skills;
-      console.log(convInUsrObj);
       return knex('users')
         .where('id', '=', usrId)
         .update(convInUsrObj)
