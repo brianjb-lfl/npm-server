@@ -7,8 +7,6 @@ const oppRouter = express.Router();
 const { epHelp } = require('./router-helpers');
 const bodyParser = require('body-parser');
 const jsonParser = bodyParser.json();
-let causeArr = [];
-let resArr = [];
 
 process.stdout.write('\x1Bc');
 
@@ -120,14 +118,12 @@ oppRouter.put('/:id', jsonParser, (req, res) => {
     .returning(['id', 'opportunity_type as opportunityType', 'narrative'])
 
     .then( results => {
-      // save return info for client response
-      retObj = Object.assign( {}, results[0]);
       return knex('opportunities_causes')
         .where('id_opp', '=', oppId)
         .del()
         .then( () => {
           if(inCausesArr.length > 0) {
-            return epHelp.buildOppCausesArr(retObj.id, inCausesArr)
+            return epHelp.buildOppCausesArr(oppId, inCausesArr)
               .then( postCausesArr => {
                 return knex('opportunities_causes')
                   .insert(postCausesArr);
@@ -138,16 +134,18 @@ oppRouter.put('/:id', jsonParser, (req, res) => {
             return;
           }
         })
-
         .then( () => {
-          res.status(201).json(retObj);
-        })
-
-        .catch( err => {
-          if(err.reason === 'ValidationError') {
-            return res.status(err.code).json(err);
-          }
-          res.status(500).json({message: 'Internal server error'});
+          return epHelp.buildOpp(oppId)
+            .then( result => {
+              retObj = Object.assign( {}, result);
+              res.status(201).json(retObj);      
+            })
+            .catch( err => {
+              if(err.reason === 'ValidationError') {
+                return res.status(err.code).json(err);
+              }
+              res.status(500).json({message: 'Internal server error'});
+            });
         });
     });
 });
