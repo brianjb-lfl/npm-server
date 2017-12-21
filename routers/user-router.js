@@ -60,32 +60,14 @@ userRouter.get('/test', jsonParser, (req, res) => {
 
 // GET api/users/list
 userRouter.get('/list', (req, res) => {
-  const knex = require('../db');
-  let convQuery = epHelp.convertCase(req.query, 'ccToSnake');
-  const calcUserField = 
-    "case when users.organization isnull then "
-      + "users.last_name || ', '  || users.first_name "
-      + "else users.organization "
-      + "end as user_string";
-  return knex
-    .select(
-      'id',
-      'username',
-      'location_city as locationCity',
-      'location_state as locationState', 
-      'first_name as firstName',
-      'last_name as lastName',
-      'organization',
-      'user_type as userType',
-      knex.raw(calcUserField)
-    )
-    .from ('users')
-    .where(convQuery)
-    .orderBy('username')
-    .debug(false)
-    .then( results => {
-      res.json(results);
+  
+  return epHelp.buildUsersFull()
+  
+    .then(results => {
+      const userArr = results.slice();
+      res.json(userArr);
     })
+
     .catch( err => {
       res.status(500).json({message: 'Internal server error'});
     });    
