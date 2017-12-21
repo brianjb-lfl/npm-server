@@ -39,7 +39,7 @@ responseRouter.post('/', jsonParser, (req, res) => {
       'response_status as responseStatus',
       'notes'])
     .then( results => {
-      res.json(results);
+      res.json(results[0]);
     })
     .catch( err => {
       if(err.reason === 'ValidationError') {
@@ -79,7 +79,7 @@ responseRouter.put('/:id', jsonParser, (req, res) => {
           'response_status as responseStatus',
           'notes'])
         .then( results => {
-          res.json(results);
+          res.json(results[0]);
         })
         .catch( err => {
           if(err.reason === 'ValidationError') {
