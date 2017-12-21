@@ -27,49 +27,22 @@ oppRouter.get('/testify/secure', jwtAuth, (req, res) => {
 
 //GET api/opportunities/list
 oppRouter.get('/list', (req, res) => {
-  const knex = require('../db');
-  //const calcUserField = 
-  // "case when users.organization isnull then "
-  //   + "users.last_name || ', '  || users.first_name "
-  //   + "else users.organization "
-  //   + "end as user_string";
-  return knex('opportunities_causes')
-    .join('causes', 'opportunities_causes.id_cause', '=', 'causes.id')
-    .select('causes.id', 'opportunities_causes.id_opp', 'causes.cause')
-    .orderBy('causes.cause')
-    .then( results => causeArr = results.slice())
-    .then( () => {
-      return knex('opportunities')
-        .join('users', 'opportunities.id_user', '=', 'users.id')
-        .select()
-        .orderBy('timestamp_start')
-        .debug(false)
-        .then( results => {
-          results.forEach ( opp => {
-            const tempCauses = causeArr
-              .filter( cause => cause.id_opp === opp.id)
-              .map( cause => cause.cause);
-            console.log(opp);
-            let tempOpp = epHelp.convertCase(opp, 'snakeToCC');
-            tempOpp = Object.assign( {}, tempOpp, {
-              causes: tempCauses
-            });
-            resArr.push(tempOpp);
-            console.log(resArr);
-          });
-          res.json(resArr);
-        })
-        .catch( err => {
-          res.status(500).json({message: 'Internal server error'});
-        });
+
+  return epHelp.buildOppList()
+    .then( results => {
+      res.json(results);
+    })
+    .catch( err => {
+      res.status(500).json({message: 'Internal server error'});
     });
 });
 
 // POST api/opportunities
 oppRouter.post('/', jsonParser, (req, res) => {
+  let oppId;
   let inOppObj = req.body;
   let retObj = {};
-  let inCausesArr = Array.isArray(inOppObj.causes) ? inOppObj.causes.slice() : [] ;
+  let inCausesArr = (inOppObj.causes.length > 0) ? inOppObj.causes.slice() : [] ;
   // check for missing fields
   const reqFields = ['title', 'narrative', 'userId', 'causes'];
   const missingField = reqFields.find( field => !(field in inOppObj));
@@ -87,26 +60,11 @@ oppRouter.post('/', jsonParser, (req, res) => {
 
   return knex('opportunities')
     .insert(postOppObj)
-    .returning(['id', 
-      'user_id as userId',
-      'organization',
-      'opportunity_type as opportunityType',
-      'offer',
-      'title',
-      'narrative',
-      'timestamp_start as timestampStart',
-      'timestamp_end as timestampEnd',
-      'location_city as locationCity',
-      'location_state as locationState',
-      'location_country as locationCountry',
-      'link'
-    ])
-
-    .then( results => {
-      // save return info for client response
-      retObj = Object.assign( {}, results[0]);
+    .returning(['id'])
+    .then( result => {
+      oppId = result[0].id;
       if(inCausesArr.length > 0) {
-        return epHelp.buildOppCausesArr(retObj.id, inCausesArr)
+        return epHelp.buildOppCausesArr(oppId, inCausesArr)
           .then( postCausesArr => {
             return knex('opportunities_causes')
               .insert(postCausesArr);
@@ -117,16 +75,18 @@ oppRouter.post('/', jsonParser, (req, res) => {
         return;
       }
     })
-
     .then( () => {
-      res.status(201).json(retObj);
-    })
-
-    .catch( err => {
-      if(err.reason === 'ValidationError') {
-        return res.status(err.code).json(err);
-      }
-      res.status(500).json({message: 'Internal server error'});
+      return epHelp.buildOpp(oppId)
+        .then( result => {
+          retObj = Object.assign( {}, result);
+          res.status(201).json(retObj);      
+        })
+        .catch( err => {
+          if(err.reason === 'ValidationError') {
+            return res.status(err.code).json(err);
+          }
+          res.status(500).json({message: 'Internal server error'});
+        });
     });
 });
 

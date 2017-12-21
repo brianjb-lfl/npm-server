@@ -156,7 +156,6 @@ describe('user', function() {
         .post('/api/users/register')
         .send(testUser)
         .then(function(res) {
-          console.log(res.body);
           expect(res.body).type.to.be('object');
           expect(res.body.username).to.equal(testData.testIndividual.username);
           return chai.request(app)
@@ -183,7 +182,6 @@ describe('user', function() {
         .post('/api/users/register')
         .send(testOrg)
         .then(function(res) {
-          console.log(res.body);
           expect(res.body).type.to.be('object');
           expect(res.body.username).to.equal(testOrg.username);
           return chai.request(app)

@@ -115,33 +115,70 @@ epHelp.buildUser = function (userId) {
     });
 };
 
-epHelp.getOppBase = function(inOppId) {
+epHelp.buildOppList = function() {
+
+  let causeArr = [];
+  let resArr = [];
   const knex = require('../db');
-  const calcUserField = 
-    "case when users.organization isnull then "
-      + "users.last_name || ', '  || users.first_name "
-      + "else users.organization "
-      + "end as userString";
-  return knex('opportunities')
-    .join('users', 'opportunities.id_user', '=', 'users.id')
-    .select(
-      'opportunities.id',
-      'users.id',
-      'opportunity_type as opportunityType',
-      'users.username',
-      'opportunities.id_user as idUser',
-      'offer',
-      'title',
-      'narrative',
-      'timestamp_start as timestampStart',
-      'timestamp_end as timestampEnd',
-      'opportunities.location_city as locationCity',
-      'opportunities.location_state as locationState',
-      'opportunities.location_country as locationCountry',
-      'link',
-      knex.raw(calcUserField)
-    )
-    .where()
+  //const calcUserField = 
+  // "case when users.organization isnull then "
+  //   + "users.last_name || ', '  || users.first_name "
+  //   + "else users.organization "
+  //   + "end as user_string";
+  return knex('opportunities_causes')
+    .join('causes', 'opportunities_causes.id_cause', '=', 'causes.id')
+    .select('causes.id', 'opportunities_causes.id_opp', 'causes.cause')
+    .orderBy('causes.cause')
+    .then( results => causeArr = results.slice())
+    .then( () => {
+      return knex('opportunities')
+        .join('users', 'opportunities.id_user', '=', 'users.id')
+        .select()
+        .orderBy('timestamp_start')
+        .debug(false)
+        .then( results => {
+          results.forEach ( opp => {
+            const tempCauses = causeArr
+              .filter( cause => cause.id_opp === opp.id)
+              .map( cause => cause.cause);
+            let tempOpp = epHelp.convertCase(opp, 'snakeToCC');
+            tempOpp = Object.assign( {}, tempOpp, {
+              causes: tempCauses
+            });
+            resArr.push(tempOpp);
+          });
+          return resArr;
+        });
+    });
+
+};
+
+epHelp.buildOpp = function(inOppId) {
+
+  let causeArr = [];
+  let resObj = {};
+  const knex = require('../db');
+
+  return knex('opportunities_causes')
+    .join('causes', 'opportunities_causes.id_cause', '=', 'causes.id')
+    .select('causes.cause')
+    .where('opportunities_causes.id_opp', '=', inOppId)
+    .orderBy('causes.cause')
+    .then( results => {
+      causeArr = results.map( cause => cause.cause);
+      return knex('opportunities')
+        .join('users', 'opportunities.id_user', '=', 'users.id')
+        .select()
+        .where('opportunities.id', '=', inOppId)
+        .debug(false)
+        .then( result => {
+          const tempOppObj = epHelp.convertCase(result[0], 'snakeToCC');
+          resObj = Object.assign( {}, tempOppObj, {
+            causes: causeArr
+          });
+          return resObj;
+        });
+    });
 };
 
 epHelp.buildOppBase = function(inOppObj) {
@@ -153,8 +190,8 @@ epHelp.buildOppBase = function(inOppObj) {
     location_city: inOppObj.locationCity ? inOppObj.locationCity : null,
     location_state: inOppObj.locationState ? inOppObj.locationState : null,
     location_country: inOppObj.locationCountry ? inOppObj.locationCountry : null,
-    timestamp_start: inOppObj.timestampStart ? inOppObj.timestampStart : null,
-    timestamp_end: inOppObj.timestampEnd ? inOppObj.timestampEnd : null,
+    // timestamp_start: inOppObj.timestampStart ? inOppObj.timestampStart : null,
+    // timestamp_end: inOppObj.timestampEnd ? inOppObj.timestampEnd : null,
   });
 
   delete retBaseObj.opportunityType;
