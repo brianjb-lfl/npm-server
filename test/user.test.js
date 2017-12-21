@@ -79,7 +79,7 @@ describe('user', function() {
         .then ( results => {
           focusUser = results;
           return chai.request(app)
-            .get(`/api/users/${focusUser.focus_user_id}`)
+            .get(`/api/users/${focusUser.focus_user_id}`);
         })
         .then( res => {
           // test general user info
@@ -96,14 +96,14 @@ describe('user', function() {
           // expect(res.body.causes.length).to.equal(98);    // failing test
           const expUserCausesArr = testData.testUserCauses.map( item => item.cause);
           for(let cCtr = 0; cCtr < res.body.causes.length; cCtr++) {
-            expect(expUserCausesArr).to.include(res.body.causes[cCtr].cause);
+            expect(expUserCausesArr).to.include(res.body.causes[cCtr]);
           }
           // test user skills
           expect(res.body.skills.length).to.equal(testData.testUserSkills.length);
           // expect(res.body.skills.length).to.equal(97);    // failing test
           const expUserSkillsArr = testData.testUserSkills.map( item => item.skill);
           for(let sCtr = 0; sCtr < res.body.skills.length; sCtr++) {
-            expect(expUserSkillsArr).to.include(res.body.skills[sCtr].skill);
+            expect(expUserSkillsArr).to.include(res.body.skills[sCtr]);
           }
         });
     });

@@ -84,7 +84,7 @@ describe('admin', function() {
           // expect(res.body[0]).to.equal('cat juggler extraordinaire');    // failing test
           // check users
           expect(res.body.users.length)
-            .to.equal(testData.userSeeds.filter( item => item.user_type === 'organization').length);
+            .to.equal(testData.userSeeds.length);
           res.body.users.forEach( usrObj => {
             let tempSeedUser = testData.userSeeds.filter( item => item.username === usrObj.username);
             expect(tempSeedUser.length).to.equal(1);    // tests username = seed username

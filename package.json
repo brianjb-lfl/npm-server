@@ -40,7 +40,7 @@
     "start": "nodemon server.js",
     "dev": "nodemon server.js",
     "test": "mocha --colors test/*.test.js",
-    "coverage": "nyc mocha --colors test/*test.js",
+    "coverage": "nyc mocha --colors test/*.test.js",
     "nyc": "test",
     "cover": "nodemon --exec nyc --reporter=lcov --reporter=text-summary mocha test/*.test.js",
     "travis": "mocha test/*test.js"
