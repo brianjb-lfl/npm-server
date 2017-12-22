@@ -100,28 +100,7 @@ note: use of this api requires access to a postgres database<br>
 The api can now be accessed at:  
 ```http://localhost:8080/```
 
-See below for specific endpoints.
 
-
-Data Fields
-------
-
-|  **field**          |         **description**                                                      |
-|:--------------------|:-----------------------------------------------------------------------------|
-|  id                 |  uniquely assigned id                                                        |
-|  table              |  number, table number at which patron is seated                              |
-|  seat               |  number, seat in which patron is seated                                      |
-|  weight             |  number, for bac calculation, patron's estimated weight                      |
-|  gender             |  string, for bac calculation, patron's apparent gender                       |
-|  start              |  timestamp - when patron arrived at establishment                            |
-|  drinks             |  array of objects, each representing a drink consumed by the patron          |
-|  drinks: drinkEq    |  number, relative strength/alcohol content of drink<br>e.g. 1 = 12oz beer, glass of wine, or shot of liquor
-|  drinks: drinkTime  |  timestamp, time at which drink was ordered, used in bac calculation         |
-|                     |                                                                              |
-|  virtual fields     |                                                                              |
-|  *bac*              |  number, patron's estimated blood-alcohol level with leading ".0" removed    |
-|  *timeOnSite*       |  string, format "hh:mm" representing the patron's current length of stay     |
-|  *seatString*       |  string, format "Table # - Seat #" summarizing patron's location             |
 
 
 Endpoints
