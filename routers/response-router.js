@@ -59,7 +59,7 @@ responseRouter.put('/:id', jsonParser, (req, res) => {
     return res.status(422).json({
       code: 422,
       reason: 'ValidationError',
-      message: 'Error: opportunity and user id required'
+      message: 'Error: opportunity, user id and notes required'
     });
   }
   respPutObj = epHelp.convertCase(req.body, 'ccToSnake');
