@@ -184,7 +184,7 @@ epHelp.getExtUserInfo = function(usrId) {
         .where('responses.id_user', '=', usrId)
         .select(
           'responses.id',
-          'responses.id_opp as idOpp',
+          'responses.id_opp as idOpportunity',
           'notes',
           'response_status as responseStatus',
           'responses.timestamp_status_change as timestampStatusChange',
