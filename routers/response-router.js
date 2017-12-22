@@ -74,6 +74,7 @@ responseRouter.put('/:id', jsonParser, (req, res) => {
   });
   return knex('responses')
     .update(respPutObj)
+    .where('id', '=', 'respId')
     .then( () => {
       return (epHelp.buildResponse( respId ))
         .then ( result => {
