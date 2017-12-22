@@ -19,7 +19,7 @@ responseRouter.post('/', jsonParser, (req, res) => {
   let respPostObj = {};
 
   // check for required fields
-  const reqFields = ['userId', 'idOpportunity'];
+  const reqFields = ['userId', 'idOpportunity', 'notes'];
   const missingField = reqFields.filter( field => !(field in req.body));
   if(missingField.length > 0) {
     return res.status(422).json({
@@ -29,17 +29,14 @@ responseRouter.post('/', jsonParser, (req, res) => {
     });
   }
   respPostObj = epHelp.convertCase(req.body, 'ccToSnake');
-  console.log(respPostObj);
   return knex('responses')
     .insert(respPostObj)
-    .returning ([
-      'id',
-      'id_user as userId',
-      'id_opp as idOpportunity',
-      'response_status as responseStatus',
-      'notes'])
-    .then( results => {
-      res.json(results);
+    .returning ('id')
+    .then( rId => {
+      return (epHelp.buildResponse( rId[0] ))
+        .then ( result => {
+          res.json(result);
+        });
     })
     .catch( err => {
       if(err.reason === 'ValidationError') {
@@ -51,42 +48,37 @@ responseRouter.post('/', jsonParser, (req, res) => {
 
 // PUT api/responses/:id
 responseRouter.put('/:id', jsonParser, (req, res) => {
+  const respId = req.params.id;
   const knex = require('../db');
-  let respPostObj = {};
+  let respPutObj = {};
 
-  // validate response id
+  // check for required fields
+  const reqFields = ['userId', 'idOpportunity', 'notes'];
+  const missingField = reqFields.filter( field => !(field in req.body));
+  if(missingField.length > 0) {
+    return res.status(422).json({
+      code: 422,
+      reason: 'ValidationError',
+      message: 'Error: opportunity and user id required'
+    });
+  }
+  respPutObj = epHelp.convertCase(req.body, 'ccToSnake');
+  respPutObj = Object.assign( {}, respPutObj, {
+    timestamp_status_change: new Date()
+  });
   return knex('responses')
-    .select('id')
-    .where('id', '=', req.params.id)
-    .then( result => {
-      if(result.length < 1) {
-        return res.status(422).json({
-          code: 422,
-          reason: 'ValidationError',
-          message: 'Error: response not found'
+    .update(respPutObj)
+    .then( () => {
+      return (epHelp.buildResponse( respId ))
+        .then ( result => {
+          res.json(result);
         });
+    })
+    .catch( err => {
+      if(err.reason === 'ValidationError') {
+        return res.status(err.code).json(err);
       }
-      respPostObj = epHelp.convertCase(req.body, 'ccToSnake');
-      console.log(respPostObj);
-      console.log(req.params.id);
-      return knex('responses')
-        .where('id', '=', req.params.id)
-        .update(respPostObj)
-        .returning ([
-          'id',
-          'id_user as userId',
-          'id_opp as idOpportunity',
-          'response_status as responseStatus',
-          'notes'])
-        .then( results => {
-          res.json(results);
-        })
-        .catch( err => {
-          if(err.reason === 'ValidationError') {
-            return res.status(err.code).json(err);
-          }
-          res.status(500).json({message: 'Internal server error'});
-        });
+      res.status(500).json({message: 'Internal server error'});
     });
 });
 

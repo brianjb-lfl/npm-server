@@ -215,6 +215,38 @@ epHelp.buildOpp = function(inOppId) {
     });
 };
 
+epHelp.buildResponse = function(inRespId) {
+  
+  let resObj = {};
+
+  const knex = require('../db');
+  return knex('responses')
+    .join('users', 'responses.id_user', '=', 'users.id')
+    .where('responses.id', '=', inRespId)
+    .select(
+      'responses.id',
+      'id_opp',
+      'id_user',
+      'notes',
+      'response_status',
+      'timestamp_status_change',
+      'responses.timestamp_created',
+      'users.organization',
+      'users.first_name',
+      'users.last_name'
+    )
+    .then( result => {
+      resObj = this.convertCase(result[0], 'snakeToCC');
+      return this.getTitle(resObj.idOpportunity)
+        .then( title => {
+          resObj = Object.assign( {}, resObj, {
+            title: title
+          });
+          return resObj;
+        });
+    });
+};
+
 epHelp.getOrg = function(inUsrId) {
   const knex = require('../db');
   return knex('users')
@@ -222,6 +254,16 @@ epHelp.getOrg = function(inUsrId) {
     .where('id', '=', inUsrId)
     .then( result => {
       return (result[0].organization);
+    });
+};
+
+epHelp.getTitle = function(inOppId) {
+  const knex = require('../db');
+  return knex('opportunities')
+    .select('title')
+    .where('id', '=', inOppId)
+    .then( result => {
+      return (result[0].title);
     });
 };
 
@@ -301,33 +343,33 @@ const snakeToCC = {
   timestamp_status_change: 'timestampStatusChange'
 };
 
+const ccToSnake = {
+  userType: 'user_type',
+  locationCity: 'location_city',
+  locationState: 'location_state',
+  locationCountry: 'location_country',
+  firstName: 'first_name',
+  lastName: 'last_name',
+  opportunityType: 'opportunity_type',
+  userId: 'id_user',
+  idCause: 'id_cause',
+  idOpp: 'id_opp',
+  idOpportunity: 'id_opp',
+  idSkill: 'id_skill',
+  idUserAdding: 'id_user_adding',
+  idUserReceiving: 'id_user_receiving',
+  linkType: 'link_type',
+  linkUrl: 'link_url',
+  responseStatus: 'response_status',
+  timestampCreated: 'timestamp_created',
+  timestampStart: 'timestamp_start',
+  timestampEnd: 'timestamp_end',
+  timestampStatusChange: 'timestamp_status_change'
+};
+
 epHelp.convertCase = function(caseObj, mode) {
 
   let convTbl = {};
-
-  const ccToSnake = {
-    userType: 'user_type',
-    locationCity: 'location_city',
-    locationState: 'location_state',
-    locationCountry: 'location_country',
-    firstName: 'first_name',
-    lastName: 'last_name',
-    opportunityType: 'opportunity_type',
-    userId: 'id_user',
-    idCause: 'id_cause',
-    idOpp: 'id_opp',
-    idOpportunity: 'id_opp',
-    idSkill: 'id_skill',
-    idUserAdding: 'id_user_adding',
-    idUserReceiving: 'id_user_receiving',
-    linkType: 'link_type',
-    linkUrl: 'link_url',
-    responseStatus: 'response_status',
-    timestampCreated: 'timestamp_created',
-    timestampStart: 'timestamp_start',
-    timestampEnd: 'timestamp_end',
-    timestampStatusChange: 'timestamp_status_change'
-  };
 
   if(mode === 'ccToSnake') {
     convTbl = ccToSnake;
