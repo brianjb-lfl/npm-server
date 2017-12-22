@@ -1,44 +1,44 @@
 <h1>CAUSEWAY API</h1>
-<p><em>This document provides general information on the Causeway app and details on the api.  For more information about the Buzz-Kill client, please see <a href="https://github.com/brianjb-lfl/buzz-kill-frontend/blob/master/README.md">Buzz-Kill front end</a>.</em></p>
+<p><em>This document provides general information on the Causeway app (formerly Non-Profit Match) and details on the api.  For more information about the Causeway client, please see <a href="https://github.com/brianjb-lfl/npmatch">Causeway front end</a>.</em></p>
 
 
-Why Buzz-Kill
+Causeway
 -------------
-Every restaurant, bar and club owner wants to provide a safe and enjoyable guest experience.  Buzz-Kill is an easy-to-use tool that helps managers and their staff monitor patrons' alcohol consumption and spot potential problems early.  It requires minimal additional effort by servers and presents information in a format that is easy for busy managers to process in a quick glance.
+Causeway facilitates meaningful contributions to meaningful causes.  People WANT to make a difference, to do their part to make their neighborhood, community, world, better.  Individuals:  What many don't realize is that they already have talents, experiences, and/or disposable resources that could be put to use in this effort.  Causeway helps you find accessible opportunities to plug in.  Organizations:  Causeway also seeks to help caring organizations find impactful help.  It links them with the skills and resources that will make a real difference in their situation.
 
 How it Works
 ------------
 <table layout="fixed">
   <tr>
     <td width="55%">
-      <p>Buzz-Kill's main screen displays a colored box for each patron in the establishment.  The color-coding and easy-to-read number on the box represent an estimate of that patron's bac based on the count and timing of their drinks during the current visit.</p>
+      <p>placeholder</p>
     </td>
     <td width = "40%">
-      <img src="/img/buzz-kill-main.png" max-height="240px" width="auto">
+      <img src="/img/hands.jpg" max-height="240px" width="auto">
     </td>
   </tr>
   <tr>
     <td>
-      <p>When a new patron arrives, the server logs them in by table and seat.  To facilitate the bac calculation, the patron's gender is also logged.  As an option for more accuracy, the system can be modified to accept an estimate of the patron's weight.</p>
+      <p>placeholder</p>
     </td>
     <td>
-      <img src="/img/buzz-kill-addpatron.png" max-height="240px" witdh="auto">
-    </td>
-  </tr>
-  <tr>
-    <td>
-      <p>Key information is provided for each patron in a user-friendly format.  The color of the patron info box changes gradually from green to red as the patron has more to drink, and then back toward green over time as the patron metabolizes the alcohol they've consumed.  The number indicates the patron's calculated bac expressed in 100th's of a percent.  This format is used to make the number easier to recognize at a glance.  For more detail, the patron's current time of stay in the establishment and a graphical representation of their drink orders is provided.</p>
-    </td>
-    <td>
-      <img src="/img/buzz-kill-patrondet.png" max-height="240px" witdh="auto">
+      <img src="/img/hands.jpg" max-height="240px" width="auto">
     </td>
   </tr>
   <tr>
     <td>
-      <p>And if someone goes too far, help is a just a click away.  The system will allow a phone call, text message or email to be sent to the recipient of the establishment's choosing.</p>
+      <p>placeholder</p>
     </td>
     <td>
-      <img src="/img/buzz-kill-patronemergency.png" max-height="240px" witdh="auto">
+      <img src="/img/hands.jpg" max-height="240px" width="auto">
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <p>placeholder</p>
+    </td>
+    <td>
+      <img src="/img/hands.jpg" max-height="240px" width="auto">
     </td>
   </tr>
 </table>
@@ -48,34 +48,53 @@ Where to find Buzz-Kill
 
 |          **desc**        |                   **location**                                          |
 |--------------------------|-------------------------------------------------------------------------|
-|live client               |   https://buzz-kill-bbp.herokuapp.com/             .                    |
-|client code               |   https://github.com/brianjb-lfl/buzz-kill-frontend                     |
-|deployed api              |   https://buzz-kill-backend-bbp.herokuapp.com/                          |
-|api code                  |   https://github.com/brianjb-lfl/buzz-kill-back                         | 
+|live client               |   https://stoic-mccarthy-9c52cc.netlify.com/                            |
+|client code               |   https://github.com/brianjb-lfl/npmatch                                |
+|deployed api              |   https://dry-escarpment-60455.herokuapp.com/                           |
+|api code                  |   https://github.com/brianjb-lfl/npm-server                             | 
 
 Local API Use
 ------
 1.  clone this repository<br>
-``` git clone https://github.com/brianjb-lfl/buzz-kill-back.git```<br>
+``` git clone https://github.com/brianjb-lfl/npm-server```<br>
 
 2.  move to the repository's local directory<br>
-``` cd buzz-kill-back```<br>
+``` cd npm-server```<br>
 
 3.  install dependencies<br>
 ``` npm install```<br>
 
-note: use of this api requires access to a mongo database<br>
+4.  add a .env file to the project root *** NOTE: Make sure .env is included in the<br>
+    package .gitignore file (also in the root).
+```
+    #Port
+    PORT=8080
 
-4.  if using a remote database instance (e.g. mLab)<br>
+    #DB
+    DATABASE_URL=
+    TEST_DATABASE_URL=
+    DB_MODE=dev
+
+    #Cors
+    CLIENT_ORIGIN=http://localhost:3000
+
+    #jwt
+    JWT_SECRET=
+    JWT_EXPIRY=7d
+```
+
+note: use of this api requires access to a postgres database<br>
+
+5.  if using a remote database instance (e.g. elephantSQL)<br>
     create a .env file in the repository root with the following line:<br>
 ``` DATABASE_URL=(database connection string/url)```<br>
 
-4.  or, you can use a local mongo database<br>
+6.  OR, you can use a local mongo database<br>
     when using a local database, omit the DATABASE_URL .env setting<br>
     in the config.js file, modify the second part of the following line accordingly<br>
-``` process.env.DATABASE_URL || 'mongodb://localhost/thinkful-backend'```<br>
+``` process.env.DATABASE_URL || 'postgres://localhost:{port}/{dbname}'```<br>
 
-5.  start the server<br>
+7.  start the server<br>
 ``` npm start```<br>
 
 The api can now be accessed at:  
@@ -95,7 +114,7 @@ Data Fields
 |  weight             |  number, for bac calculation, patron's estimated weight                      |
 |  gender             |  string, for bac calculation, patron's apparent gender                       |
 |  start              |  timestamp - when patron arrived at establishment                            |
-|  drinks         |  array of objects, each representing a drink consumed by the patron          |
+|  drinks             |  array of objects, each representing a drink consumed by the patron          |
 |  drinks: drinkEq    |  number, relative strength/alcohol content of drink<br>e.g. 1 = 12oz beer, glass of wine, or shot of liquor
 |  drinks: drinkTime  |  timestamp, time at which drink was ordered, used in bac calculation         |
 |                     |                                                                              |
@@ -107,74 +126,49 @@ Data Fields
 
 Endpoints
 ------
-Base url:  https://buzz-kill-backend-bbp.herokuapp.com/
+Base url:  https://dry-escarpment-60455.herokuapp.com/
 
-**GET api/patrons**<br>
-Returns array of objects with detailed information on each patron in the establishment.  Sample patron object:
+**api/auth**<br>
+Login route
 ```    
-    {
-        "id": "59f2970fc2722500123d4f03",
-        "seatString": "Table 1 - Seat 1",
-        "start": "2017-10-27T02:16:47.983Z",
-        "drinks": [
-            {
-                "_id": "59f2971fc2722500123d4f04",
-                "drinkTime": "2017-10-27T02:17:03.586Z",
-                "drinkEq": 1
-            }
-        ],
-        "bac": "0.9",
-        "timeOnSite": "1:10"
-    }
-```
-On success, return code: 200
-On failure, return code: 500
-
-
-**POST api/patrons**<br>
-Include in header ...  Content-Type:  application/json
-Include in body ... table, seat, gender and weight (optional)
-
 
 ```
-{
-	"table": "1",
-	"seat": "2",
-	"gender": "m"
-}
+
+
+
+**api/admin**<br>
+Accessed on login to provide initial data load.
 ```
-On success, return code: 201
-On failure, return code: 422 (input error), or 500 (server error)
-Will return detailed information (see GET call) on the patron just added.
-
-
-**PUT api/drinks/patron_id**<br>
-Include in header ...  Content-Type:  application/json
-Include in body ... patron's id (must match id in url) and drink equivalent
 
 ```
-{
-	"_id": "59f2970fc2722500123d4f03",
-	"drinks": {"drinkEq": 1.5}
-}
+
+
+
+**api/users**<br>
+Data retrieval and functionality related to individual and organization users.
 ```
-On success, return code: 201
-On failure, return code: 400 (input error) or 500 (server error)
 
-Will return detailed information (see GET call) on the patron just added.
+```
 
 
-**DELETE api/patrons/patron_id**<br>
-Id in url must be valid id of currently active patron.
 
-On success, return code: 204
-On failure, return code: 422 (input error) or 500 (server error)
+**api/opportunities**<br>
+Data retrieval and functionality related to opportunities to serve and be served.
 
-**DELETE api/patrons/dayclose**<br>
-CAUTION:  This will delete all from the patrons collection.  This cannot be undone.
 
-On success, return code: 204
-On failure, return code: 500
+
+**api/roles**<br>
+Functionality to link organizations and their admin users.
+Functionality to connect users to the organizations they want to follow.
+
+
+
+
+**api/responses**<br>
+Functionality to manage user responses to posted opportunities.
+
+
+
 
 Technology Used
 ------
@@ -182,7 +176,9 @@ Technology Used
 * node.js
 * express
 * cors
-* moment
-* mongodb
-* mongoose
+* postgresql
+* knex
+* bcrypt
+* passport
 * mocha, chai
+
