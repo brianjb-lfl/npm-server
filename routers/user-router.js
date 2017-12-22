@@ -163,17 +163,28 @@ userRouter.put('/:id', jsonParser, (req, res) => {
 
     .then( result => {
       // process base user info
-      if(result){
-        convInUsrObj = Object.assign( {}, convInUsrObj, {
-          password: result
-        });
-      }
-      delete convInUsrObj.links;
-      delete convInUsrObj.causes;
-      delete convInUsrObj.skills;
+     
+      const slimUser = Object.assign( {}, {
+        password: result,
+        logo: convInUsrObj.logo,
+        availability: convInUsrObj.availability,
+        bio: convInUsrObj.bio,
+        first_name: convInUsrObj.firstName,
+        last_name: convInUsrObj.lastName,
+        location_city: convInUsrObj.lastName,
+        location_state: convInUsrObj.locationState,
+        location_country: convInUsrObj.locationCountry,
+        user_type: convInUsrObj.userType,
+      });
+    
+      // delete convInUsrObj.links;
+      // delete convInUsrObj.causes;
+      // delete convInUsrObj.skills;
+      // delete convInUsrObj.id;
+      console.log('slimUser',slimUser);
       return knex('users')
         .where('id', '=', usrId)
-        .update(convInUsrObj)
+        .update(slimUser)
         .returning(['id', 'username']);
     })
 

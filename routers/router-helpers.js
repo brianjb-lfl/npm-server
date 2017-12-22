@@ -184,12 +184,16 @@ epHelp.getExtUserInfo = function(usrId) {
         .where('responses.id_user', '=', usrId)
         .select(
           'responses.id',
-          'responses.id_opp as idOpp',
+          'responses.id_user as userId',
+          'responses.id_opp as idOpportunity',
           'notes',
           'response_status as responseStatus',
           'responses.timestamp_status_change as timestampStatusChange',
           'responses.timestamp_created as timestampCreated',
-          'opportunities.title')
+          'opportunities.title',
+          'opportunities.location_city as locationCity',
+          'opportunities.location_state as locationState',
+          'opportunities.location_country as locationCountry' )
         .orderBy('responses.timestamp_created');
     })
     .then( responses => {

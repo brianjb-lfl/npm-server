@@ -66,7 +66,9 @@ responseRouter.put('/:id', jsonParser, (req, res) => {
   respPutObj = Object.assign( {}, respPutObj, {
     timestamp_status_change: new Date()
   });
+  delete respPutObj.id;
   return knex('responses')
+    .where('id', '=', respId)
     .update(respPutObj)
     .then( () => {
       return (epHelp.buildResponse( respId ))

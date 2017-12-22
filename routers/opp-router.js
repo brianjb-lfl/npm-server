@@ -137,6 +137,7 @@ oppRouter.put('/:id', jsonParser, (req, res) => {
           if(inCausesArr.length > 0) {
             return epHelp.buildOppCausesArr(oppId, inCausesArr)
               .then( postCausesArr => {
+                delete postCausesArr.id;
                 return knex('opportunities_causes')
                   .insert(postCausesArr);
               });
