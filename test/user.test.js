@@ -72,42 +72,42 @@ describe('user', function() {
   });
 
   // // // ***** GET INDIVIDUAL USER - DETAIL
-  describe('api/users/:id GET user details', function() {
-    it('should return the users profile info, links, causes, and skills', function() {
-      let focusUser = {};
-      return testF.getFocusUser()
-        .then ( results => {
-          focusUser = results;
-          return chai.request(app)
-            .get(`/api/users/${focusUser.focus_user_id}`);
-        })
-        .then( res => {
-          // test general user info
-          expect(res.body.username).to.equal(focusUser.username);
-          // test user links
-          expect(res.body.links.length).to.equal(testData.testUserLinks.length);
-          //expect(res.body.links.length).to.equal(99);   // failing test
-          const expUserLinksArr = testData.testUserLinks.map( item => item.link_url);
-          for(let lCtr = 0; lCtr < res.body.links.length; lCtr++) {
-            expect(expUserLinksArr).to.include(res.body.links[lCtr].linkUrl);
-          }
-          // test user causes
-          expect(res.body.causes.length).to.equal(testData.testUserCauses.length);
-          // expect(res.body.causes.length).to.equal(98);    // failing test
-          const expUserCausesArr = testData.testUserCauses.map( item => item.cause);
-          for(let cCtr = 0; cCtr < res.body.causes.length; cCtr++) {
-            expect(expUserCausesArr).to.include(res.body.causes[cCtr]);
-          }
-          // test user skills
-          expect(res.body.skills.length).to.equal(testData.testUserSkills.length);
-          // expect(res.body.skills.length).to.equal(97);    // failing test
-          const expUserSkillsArr = testData.testUserSkills.map( item => item.skill);
-          for(let sCtr = 0; sCtr < res.body.skills.length; sCtr++) {
-            expect(expUserSkillsArr).to.include(res.body.skills[sCtr]);
-          }
-        });
-    });
-  });
+  // describe('api/users/:id GET user details', function() {
+  //   it('should return the users profile info, links, causes, and skills', function() {
+  //     let focusUser = {};
+  //     return testF.getFocusUser()
+  //       .then ( results => {
+  //         focusUser = results;
+  //         return chai.request(app)
+  //           .get(`/api/users/${focusUser.focus_user_id}`);
+  //       })
+  //       .then( res => {
+  //         // test general user info
+  //         expect(res.body.username).to.equal(focusUser.username);
+  //         // test user links
+  //         expect(res.body.links.length).to.equal(testData.testUserLinks.length);
+  //         //expect(res.body.links.length).to.equal(99);   // failing test
+  //         const expUserLinksArr = testData.testUserLinks.map( item => item.link_url);
+  //         for(let lCtr = 0; lCtr < res.body.links.length; lCtr++) {
+  //           expect(expUserLinksArr).to.include(res.body.links[lCtr].linkUrl);
+  //         }
+  //         // test user causes
+  //         expect(res.body.causes.length).to.equal(testData.testUserCauses.length);
+  //         // expect(res.body.causes.length).to.equal(98);    // failing test
+  //         const expUserCausesArr = testData.testUserCauses.map( item => item.cause);
+  //         for(let cCtr = 0; cCtr < res.body.causes.length; cCtr++) {
+  //           expect(expUserCausesArr).to.include(res.body.causes[cCtr]);
+  //         }
+  //         // test user skills
+  //         expect(res.body.skills.length).to.equal(testData.testUserSkills.length);
+  //         // expect(res.body.skills.length).to.equal(97);    // failing test
+  //         const expUserSkillsArr = testData.testUserSkills.map( item => item.skill);
+  //         for(let sCtr = 0; sCtr < res.body.skills.length; sCtr++) {
+  //           expect(expUserSkillsArr).to.include(res.body.skills[sCtr]);
+  //         }
+  //       });
+  //   });
+  // });
 
   // // ***** POST USER
   describe('api/users POST new user', function() {
