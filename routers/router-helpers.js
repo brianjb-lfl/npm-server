@@ -123,6 +123,7 @@ epHelp.getExtUserInfo = function(usrId) {
   let adminsArr = [];
   let followsArr = [];
   let oppsArr = [];
+  let respArr = [];
 
   const knex = require('../db');
 
@@ -176,18 +177,34 @@ epHelp.getExtUserInfo = function(usrId) {
     })
     .then( opps => {
       oppsArr = opps.slice();
-      return oppsArr;
+
+      // responses
+      return knex('responses')
+        .join('opportunities', 'responses.id_opp', '=', 'opportunities.id')
+        .where('responses.id_user', '=', usrId)
+        .select(
+          'responses.id',
+          'responses.id_opp',
+          'notes',
+          'response_status as responseStatus',
+          'responses.timestamp_status_change as timestampStatusChange',
+          'responses.timestamp_created as timestampCreated',
+          'opportunities.title')
+        .orderBy('responses.timestamp_created');
+    })
+    .then( responses => {
+      respArr = responses.slice();
+      resObj = Object.assign( {}, {
+        adminOf: adminOfArr,
+        admins: adminsArr,
+        following: followsArr,
+        opportunities: oppsArr,
+        responses: respArr
+      });
+      console.log(resObj);
+      return resObj;
     });
-
-
-
-
-
-
-
 };
-
-
 
 epHelp.buildOppList = function() {
 

@@ -43,15 +43,11 @@ userRouter.get('/:id', (req, res) => {
   return epHelp.buildUser(usrId)
     .then( result => {
       respObj = epHelp.convertCase(result, 'snakeToCC');
-      console.log(respObj);
       return (epHelp.getExtUserInfo(usrId));
     })
-    .then( resultArr => {
-      console.log(resultArr);
-      extAdminOf = resultArr.slice();
-      respObj = Object.assign( {}, respObj, {
-        test: extAdminOf
-      });
+    .then( resultObj => {
+      console.log(resultObj);
+      respObj = Object.assign( {}, respObj, resultObj);
       res.json(respObj);
     })
     .catch( err => {
