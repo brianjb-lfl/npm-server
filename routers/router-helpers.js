@@ -117,11 +117,12 @@ epHelp.buildUser = function (userId) {
 
 
 
-epHelp.getExtUserInfo = function(userId) {
+epHelp.getExtUserInfo = function(usrId) {
   let resObj = {};
   let adminOfArr = [];
   let adminsArr = [];
   let followsArr = [];
+  let oppsArr = [];
 
   const knex = require('../db');
 
@@ -129,7 +130,7 @@ epHelp.getExtUserInfo = function(userId) {
   return knex('roles')
     .join('users', 'roles.id_user_adding', '=', 'users.id')
     .where('capabilities', '=', 'admin')
-    .andWhere('id_user_receiving', '=', userId)
+    .andWhere('id_user_receiving', '=', usrId)
     .select('users.id', 'users.organization')
     .then( adminOfs => {
       adminOfArr = adminOfs.slice();
@@ -138,7 +139,7 @@ epHelp.getExtUserInfo = function(userId) {
       return knex('roles')
         .join('users', 'roles.id_user_receiving', '=', 'users.id')
         .where('capabilities', '=', 'admin')
-        .andWhere('id_user_adding', '=', userId)
+        .andWhere('id_user_adding', '=', usrId)
         .select(
           'users.id',
           'users.first_name as firstName',
@@ -151,16 +152,35 @@ epHelp.getExtUserInfo = function(userId) {
       return knex('roles')
         .join('users', 'roles.id_user_receiving', '=', 'users.id')
         .where('capabilities', '=', 'following')
-        .andWhere('id_user_adding', '=', userId)
+        .andWhere('id_user_adding', '=', usrId)
         .select(
           'users.id',
           'users.organization');
     })
     .then( follows => {
       followsArr = follows.slice();
-      return followsArr;
 
+      // opportunities
+      return knex('opportunities')
+        .where('id_user', '=', usrId)
+        .select(
+          'id',
+          'opportunity_type as opportunityType',
+          'offer',
+          'title',
+          'narrative',
+          'timestamp_start as timestampStart',
+          'timestamp_end as timestampEnd',
+          'link')
+        .orderBy('timestamp_start');
+    })
+    .then( opps => {
+      oppsArr = opps.slice();
+      return oppsArr;
     });
+
+
+
 
 
 
