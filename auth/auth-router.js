@@ -56,10 +56,12 @@ authRouter.post('/login', localAuth, (req, res) => {
           return (epHelp.getExtUserInfo(usrId));
         })
         .then( resultObj => {
-          console.log(resultObj);
           respObj = Object.assign( {}, respObj, resultObj, {
             authToken: authToken
           });
+          res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+          res.setHeader("Pragma", "no-cache");
+          res.setHeader("Expires", 0);  
           res.json(respObj);
         })
         .catch( err => {
