@@ -19,7 +19,7 @@ oppRouter.get('/testify/', (req, res) => {
 });
 
 // secured comm test
-oppRouter.get('/testify/secure', jwtAuth, (req, res) => {
+oppRouter.get('/testify/secure', (req, res) => {
   res.status(200).json({message: 'Good to go - *SECURED*'});
 });
 

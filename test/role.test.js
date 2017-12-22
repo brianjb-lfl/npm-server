@@ -65,13 +65,13 @@ describe('role', function() {
           testRolePostObj = testF.getTestRole(results);
           return chai.request(app)
             .post('/api/roles')
-            .send(testRolePostObj)
+            .send(testRolePostObj);
         })
         .then( res => {
-          expect(res.body.length).to.equal(1);
+          expect(res.body).to.be.an('object');
           return knex('roles')
             .select()
-            .where('id', '=', res.body[0].id)
+            .where('id', '=', res.body.id)
             .then( result => {
               expect(result[0].id_user_adding).to.equal(testRolePostObj.idUserAdding);
               expect(result[0].id_user_receiving).to.equal(testRolePostObj.idUserReceiving);
@@ -100,7 +100,7 @@ describe('role', function() {
             .send(testRolePostObj);
         })
         .then( res => {
-          roleId = res.body[0].id;
+          roleId = res.body.id;
           testRolePutObj = Object.assign( {}, testRolePostObj, {
             capabilities: 'sinister genius'
           });
@@ -133,10 +133,10 @@ describe('role', function() {
         .put(`/api/roles/${roleId}`)
         .send(testRolePutObj)
         .then( res => {
-          expect(res.body.length).to.equal(1);
+          expect(res.body).to.be.an('object');
           return knex('roles')
             .select()
-            .where('id', '=', res.body[0].id)
+            .where('id', '=', res.body.id)
             .then( result => {
               expect(result[0].id_user_adding).to.equal(testRolePutObj.idUserAdding);
               expect(result[0].id_user_receiving).to.equal(testRolePutObj.idUserReceiving);
@@ -162,7 +162,7 @@ describe('role', function() {
         })
         .then( res => {
         // verify role was added to db
-          roleId = res.body[0].id;
+          roleId = res.body.id;
           return knex('roles')
             .select()
             .where('id', '=', roleId)

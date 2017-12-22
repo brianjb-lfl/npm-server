@@ -1,12 +1,17 @@
 'use strict';
 
 const express = require('express');
+const passport = require('passport');
+const { jwtStrategy } = require('../auth/jwt-strategy');
 const roleRouter = express.Router();
 const bodyParser = require('body-parser');
 const jsonParser = bodyParser.json();
 const { epHelp } = require('./router-helpers');
 
 process.stdout.write('\x1Bc');
+
+passport.use(jwtStrategy);
+const jwtAuth = passport.authenticate('jwt', { session: false });
 
 // comm test
 roleRouter.get('/testify/', (req, res) => {
