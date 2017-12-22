@@ -43,7 +43,7 @@ How it Works
   </tr>
 </table>
 
-Where to find Buzz-Kill
+Where to find Causeway
 ------
 
 |          **desc**        |                   **location**                                          |
