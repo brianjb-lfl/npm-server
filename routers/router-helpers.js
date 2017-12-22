@@ -115,6 +115,27 @@ epHelp.buildUser = function (userId) {
     });
 };
 
+
+
+epHelp.getExtUserInfo = function(userId) {
+  let adminOfArr = [];
+
+  const knex = require('../db');
+  // admin of
+  return knex('roles')
+    .join('users', 'roles.id_user_adding', '=', 'users.id')
+    .where('capabilities', '=', 'admin')
+    .andWhere('id_user_receiving', '=', userId)
+    .select('users.id', 'users.organization')
+    .then( adminOfs => {
+      adminOfArr = adminOfs.slice();
+      return adminOfArr;
+    });
+
+};
+
+
+
 epHelp.buildOppList = function() {
 
   let causeArr = [];

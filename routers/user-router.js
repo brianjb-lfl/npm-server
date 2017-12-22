@@ -36,15 +36,25 @@ userRouter.get('/list', (req, res) => {
 
 // GET api/users/:id
 userRouter.get('/:id', (req, res) => {
-  return epHelp.buildUser(req.params.id)
+  const usrId = req.params.id;
+  let respObj = {};
+  let extAdminOf = [];
+  
+  return epHelp.buildUser(usrId)
     .then( result => {
-      if(!result.err) {
-        const resObj = epHelp.convertCase(result, 'snakeToCC');
-        res.json(resObj);
-      }
-      else {
-        res.status(500).json({message: 'Internal server error'});
-      }
+      respObj = epHelp.convertCase(result, 'snakeToCC');
+      return (epHelp.getExtUserInfo(usrId));
+    })
+    .then( resultArr => {
+      console.log(resultArr);
+      extAdminOf = resultArr.slice();
+      respObj = Object.assign( {}, respObj, {
+        adminOf: extAdminOf
+      });
+      res.json(respObj);
+    })
+    .catch( err => {
+      res.status(500).json({message: 'Internal server error'});
     });
 });
 
@@ -121,7 +131,6 @@ userRouter.put('/:id', jsonParser, (req, res) => {
   const knex = require('../db');
   let inUsrObj = Object.assign( {}, req.body);
   let convInUsrObj = {};
-  let retObj = {};
   let linksArr = req.body.links.length > 0 ? req.body.links.slice() : [] ;
   let linkPostArr = [];
   let causesArr = req.body.causes.length > 0 ? req.body.causes.slice() : [] ;
