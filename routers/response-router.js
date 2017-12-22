@@ -63,6 +63,7 @@ responseRouter.put('/:id', jsonParser, (req, res) => {
     });
   }
   respPutObj = epHelp.convertCase(req.body, 'ccToSnake');
+  if(respPutObj.id) { delete respPutObj.id; }
   respPutObj = Object.assign( {}, respPutObj, {
     timestamp_status_change: new Date()
   });

@@ -126,6 +126,7 @@ userRouter.put('/:id', jsonParser, (req, res) => {
   const usrId = req.params.id;
   const knex = require('../db');
   let inUsrObj = Object.assign( {}, req.body);
+  if(inUsrObj.id) { delete inUsrObj.id; }
   let convInUsrObj = {};
   let linksArr = req.body.links.length > 0 ? req.body.links.slice() : [] ;
   let linkPostArr = [];

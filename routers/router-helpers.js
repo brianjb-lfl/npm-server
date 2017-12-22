@@ -289,9 +289,9 @@ epHelp.buildOpp = function(inOppId) {
           'narrative',
           'timestamp_start',
           'timestamp_end',
-          'users.location_city',
-          'users.location_state',
-          'users.location_country',
+          'opportunities.location_city',
+          'opportunities.location_state',
+          'opportunities.location_country',
           'link'
         )
         .where('opportunities.id', '=', inOppId)
@@ -364,24 +364,7 @@ epHelp.getTitle = function(inOppId) {
 
 epHelp.buildOppBase = function(inOppObj) {
 
-  // camelCase to snake_case conversion
-  let retBaseObj = Object.assign( {}, inOppObj, {
-    opportunity_type: inOppObj.opportunityType ? inOppObj.opportunityType : null,
-    id_user: inOppObj.userId,
-    location_city: inOppObj.locationCity ? inOppObj.locationCity : null,
-    location_state: inOppObj.locationState ? inOppObj.locationState : null,
-    location_country: inOppObj.locationCountry ? inOppObj.locationCountry : null,
-    timestamp_start: inOppObj.timestampStart ? inOppObj.timestampStart : null,
-    timestamp_end: inOppObj.timestampEnd ? inOppObj.timestampEnd : null,
-  });
-
-  delete retBaseObj.opportunityType;
-  delete retBaseObj.userId;
-  delete retBaseObj.locationCity;
-  delete retBaseObj.locationState;
-  delete retBaseObj.locationCountry;
-  delete retBaseObj.timestampStart;
-  delete retBaseObj.timestampEnd;
+  let retBaseObj = this.convertCase(inOppObj, 'ccToSnake');
   delete retBaseObj.causes;
 
   return retBaseObj;
