@@ -10,11 +10,10 @@ const knex = require('../db');
 
 const localStrategy = new LocalStrategy((username, password, done) => {
 
-  let user;
-  
+  let user = {};
   return knex('users')
     .select()
-    .where({username: username})
+    .where('username', '=', username)
     .then( results => {
       if(!results) {
         return Promise.reject({
@@ -22,7 +21,6 @@ const localStrategy = new LocalStrategy((username, password, done) => {
           message: 'Unrecognized username'    // change this when done testing
         });
       }
-
       user = results[0];
       return validatePassword(password, user.password);
     })

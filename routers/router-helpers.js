@@ -77,14 +77,14 @@ epHelp.buildUser = function (userId) {
   // get user base info
   return knex('users')
     .select()
-    .where({id: userId})
+    .where('id', '=', userId)
     .then( results => {
       usrObj = (results[0]);
-      delete usrObj['password'];
+      delete usrObj.password;
       // get user links
       return knex('links')
         .select('id', 'link_type as linkType', 'link_url as linkUrl')
-        .where({id_user: usrObj.id});
+        .where('id_user', '=', usrObj.id);
     })
 
     .then( results => {
@@ -93,29 +93,30 @@ epHelp.buildUser = function (userId) {
       return knex('users_causes')
         .join('causes', 'users_causes.id_cause', '=', 'causes.id')
         .select('causes.id', 'causes.cause')
-        .where({id_user: usrObj.id});
+        .where('id_user', '=', usrObj.id);
     })
 
     .then( results => {
-      usrObj.causes = results.map( cause => cause.cause );
+      results.length > 0 ?
+        usrObj.causes = results.map( cause => cause.cause ) :
+        usrObj.causes = [];
       // get user skills
       return knex('users_skills')
         .join('skills', 'users_skills.id_skill', '=', 'skills.id')
         .select('skills.id', 'skills.skill')
-        .where({id_user: usrObj.id});
+        .where('id_user', '=', usrObj.id);
     })
 
     .then( results => {
-      usrObj.skills = results.map( skill => skill.skill );
+      results.length > 0 ?
+        usrObj.skills = results.map( skill => skill.skill ) :
+        usrObj.skills = [];
       return usrObj;
     })
-
     .catch( err => {
       return {err: 500, message: 'Internal server error'};
     });
 };
-
-
 
 epHelp.getExtUserInfo = function(usrId) {
   let resObj = {};
@@ -193,7 +194,7 @@ epHelp.getExtUserInfo = function(usrId) {
           'opportunities.title',
           'opportunities.location_city as locationCity',
           'opportunities.location_state as locationState',
-          'opportunities.country as locationCountry')
+          'opportunities.location_country as locationCountry')
         .orderBy('responses.timestamp_created');
     })
     .then( responses => {
@@ -205,7 +206,6 @@ epHelp.getExtUserInfo = function(usrId) {
         opportunities: oppsArr,
         responses: respArr
       });
-      console.log(resObj);
       return resObj;
     });
 };
@@ -215,11 +215,6 @@ epHelp.buildOppList = function() {
   let causeArr = [];
   let resArr = [];
   const knex = require('../db');
-  //const calcUserField = 
-  // "case when users.organization isnull then "
-  //   + "users.last_name || ', '  || users.first_name "
-  //   + "else users.organization "
-  //   + "end as user_string";
   return knex('opportunities_causes')
     .join('causes', 'opportunities_causes.id_cause', '=', 'causes.id')
     .select('causes.id', 'opportunities_causes.id_opp', 'causes.cause')

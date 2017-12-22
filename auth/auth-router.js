@@ -41,7 +41,7 @@ authRouter.post('/login', localAuth, (req, res) => {
   let user = req.body;
   return knex('users')
     .select()
-    .where({username: user.username})
+    .where('username', '=',  user.username)
     .then( result => {
       user = Object.assign( {}, user, {
         first_name: result[0].first_name,
@@ -56,6 +56,7 @@ authRouter.post('/login', localAuth, (req, res) => {
           return (epHelp.getExtUserInfo(usrId));
         })
         .then( resultObj => {
+          console.log(resultObj);
           respObj = Object.assign( {}, respObj, resultObj, {
             authToken: authToken
           });
