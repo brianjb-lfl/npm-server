@@ -17,7 +17,6 @@ passport.use(jwtStrategy);
 const knex = require('../db');
 
 const createAuthToken = function (user){
-  console.log('user in create auth token');
   return jwt.sign({user}, JWT_SECRET, {
     subject: user.username,
     expiresIn: JWT_EXPIRY,
@@ -35,7 +34,10 @@ authRouter.get('/testify', jwtAuth, (req, res) => {
 
 // login
 authRouter.post('/login', localAuth, (req, res) => {
-  console.log(req.body);
+
+  let usrId;
+  let respObj = {};
+
   let user = req.body;
   return knex('users')
     .select()
@@ -47,18 +49,20 @@ authRouter.post('/login', localAuth, (req, res) => {
         user_type: result[0].user_type
       });
       const authToken = createAuthToken(user);
-      return epHelp.buildUser(result[0].id)
-        .then( usrObj => {
-          if(!usrObj.err) {
-            usrObj = Object.assign( {}, usrObj, {
-              authToken: authToken
-            });
-            let usrObjCC = epHelp.convertCase(usrObj, 'snakeToCC');
-            res.json(usrObjCC);
-          }
-          else {
-            res.status(500).json({message: 'Error retrieving user data'});
-          }
+      usrId = result[0].id;
+      return epHelp.buildUser(usrId)
+        .then(result => {
+          respObj = epHelp.convertCase(result, 'snakeToCC');
+          return (epHelp.getExtUserInfo(usrId));
+        })
+        .then( resultObj => {
+          respObj = Object.assign( {}, respObj, resultObj, {
+            authToken: authToken
+          });
+          res.json(respObj);
+        })
+        .catch( err => {
+          res.status(500).json({message: 'Internal server error'});
         });
     });
 });

@@ -46,7 +46,6 @@ userRouter.get('/:id', (req, res) => {
       return (epHelp.getExtUserInfo(usrId));
     })
     .then( resultObj => {
-      console.log(resultObj);
       respObj = Object.assign( {}, respObj, resultObj);
       res.json(respObj);
     })
