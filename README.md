@@ -14,7 +14,7 @@ How it Works
       <p>placeholder</p>
     </td>
     <td width = "40%">
-      <img src="/img/hands.jpg" max-height="240px" width="auto">
+      <img src="/img/hands.jpg" max-height="200px" width="auto">
     </td>
   </tr>
   <tr>
@@ -22,7 +22,7 @@ How it Works
       <p>placeholder</p>
     </td>
     <td>
-      <img src="/img/hands.jpg" max-height="240px" width="auto">
+      <img src="/img/hands.jpg" max-height="200px" width="auto">
     </td>
   </tr>
   <tr>
@@ -30,7 +30,7 @@ How it Works
       <p>placeholder</p>
     </td>
     <td>
-      <img src="/img/hands.jpg" max-height="240px" width="auto">
+      <img src="/img/hands.jpg" max-height="200px" width="auto">
     </td>
   </tr>
   <tr>
@@ -38,7 +38,7 @@ How it Works
       <p>placeholder</p>
     </td>
     <td>
-      <img src="/img/hands.jpg" max-height="240px" width="auto">
+      <img src="/img/hands.jpg" max-height="200px" width="auto">
     </td>
   </tr>
 </table>
