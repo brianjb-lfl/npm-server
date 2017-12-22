@@ -118,9 +118,12 @@ epHelp.buildUser = function (userId) {
 
 
 epHelp.getExtUserInfo = function(userId) {
+  let resObj = {};
   let adminOfArr = [];
+  let adminsArr = [];
 
   const knex = require('../db');
+
   // admin of
   return knex('roles')
     .join('users', 'roles.id_user_adding', '=', 'users.id')
@@ -129,9 +132,25 @@ epHelp.getExtUserInfo = function(userId) {
     .select('users.id', 'users.organization')
     .then( adminOfs => {
       adminOfArr = adminOfs.slice();
-      return adminOfArr;
-    });
 
+      // admins
+      return knex('roles')
+        .join('users', 'roles.id_user_receiving', '=', 'users.id')
+        .where('capabilities', '=', 'admin')
+        .andWhere('id_user_adding', '=', userId)
+        .select(
+          'users.id',
+          'users.first_name as firstName',
+          'users.last_name as lastName');
+    })
+    .then( admins => {
+      adminsArr = admins.slice();
+
+      // 
+
+
+
+    });
 };
 
 
