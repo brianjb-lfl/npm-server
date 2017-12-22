@@ -77,6 +77,7 @@ roleRouter.put('/:id', jsonParser, (req, res) => {
   }
 
   rolePutObj = epHelp.convertCase(req.body, 'ccToSnake');
+  if(rolePutObj.id) { delete rolePutObj.id; }
   let orgId = rolePutObj.capabilities === 'admin' ? 
     rolePutObj.id_user_adding : rolePutObj.id_user_receiving;
   return epHelp.getOrg(orgId)
