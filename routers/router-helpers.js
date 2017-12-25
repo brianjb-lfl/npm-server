@@ -83,7 +83,7 @@ epHelp.buildUser = function (userId) {
       delete usrObj.password;
       // get user links
       return knex('links')
-        .select('id', 'link_type as linkType', 'link_url as linkUrl')
+        .select('link_type as linkType', 'link_url as linkUrl')
         .where('id_user', '=', usrObj.id);
     })
 
@@ -306,7 +306,6 @@ epHelp.buildOpp = function(inOppId) {
 };
 
 epHelp.buildResponse = function(inRespId) {
-  
   let resObj = {};
 
   const knex = require('../db');

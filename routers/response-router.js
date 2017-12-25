@@ -74,10 +74,16 @@ responseRouter.put('/:id', jsonParser, (req, res) => {
   });
   return knex('responses')
     .update(respPutObj)
-    .where('id', '=', 'respId')
+    .where('id', '=', respId)
     .then( () => {
       return (epHelp.buildResponse( respId ))
         .then ( result => {
+          delete result.timestampStatusChange;
+          delete result.timestampCreated;
+          delete result.firstName;
+          delete result.lastName;
+          delete result.title;
+          delete result.organization;
           res.json(result);
         });
     })
