@@ -20,21 +20,17 @@ roleRouter.get('/testify/', (req, res) => {
 });
 
 // new function test
-roleRouter.post('/helpertest/', (req, res) => {
-  const modObj = epDbHelp.clearUnexpFields(req.body, 'roles');
+roleRouter.post('/helpertest/', jsonParser, (req, res) => {
+  const modObj = epDbHelp.scrubFields(req.body, 'roles');
   res.status(200).json(modObj);  
 });
 
 // POST api/roles
 roleRouter.post('/', jsonParser, (req, res) => {
   const knex = require('../db');
-  let rolePostObj = {};
   let retObj = {};
   let orgName;
-
-// clear unexpected fields, convert case
-//rolePostObj = epDbHelp.
-
+  let rolePostObj = epDbHelp.scrubFields(req.body, 'roles');
 
   // validate capability
   const capabilityOpts = ['admin', 'following'];
@@ -46,7 +42,6 @@ roleRouter.post('/', jsonParser, (req, res) => {
     });
   }
 
-  rolePostObj = epHelp.convertCase(req.body, 'ccToSnake');
   let orgId = rolePostObj.capabilities === 'admin' ? 
     rolePostObj.id_user_adding : rolePostObj.id_user_receiving;
   return epHelp.getOrg(orgId)
@@ -61,9 +56,8 @@ roleRouter.post('/', jsonParser, (req, res) => {
           'capabilities']);
     })
     .then( result => {
-      retObj = Object.assign( {}, result[0], {
-        organization: orgName
-      });
+      retObj = result[0];
+      retObj.organization = orgName;
       res.json(retObj);
     })
     .catch( err => {
@@ -76,15 +70,18 @@ roleRouter.post('/', jsonParser, (req, res) => {
 
 // PUT api/roles/:id
 roleRouter.put('/:id', jsonParser, (req, res) => {
+  console.log(req.body);
   const knex = require('../db');
   const roleId = req.params.id;
-  let rolePutObj = {};
   let retObj = {};
   let orgName;
+  let rolePutObj = epDbHelp.scrubFields(req.body, 'roles');
+  if(rolePutObj.id) { delete rolePutObj.id; }
+  console.log(rolePutObj);
 
   // validate capability
   const capabilityOpts = ['admin', 'following'];
-  if(!(capabilityOpts.includes(req.body.capabilities))) {
+  if(!(capabilityOpts.includes(rolePutObj.capabilities))) {
     return res.status(422).json({
       code: 422,
       reason: 'ValidationError',
@@ -92,8 +89,6 @@ roleRouter.put('/:id', jsonParser, (req, res) => {
     });
   }
 
-  rolePutObj = epHelp.convertCase(req.body, 'ccToSnake');
-  if(rolePutObj.id) { delete rolePutObj.id; }
   let orgId = rolePutObj.capabilities === 'admin' ? 
     rolePutObj.id_user_adding : rolePutObj.id_user_receiving;
   return epHelp.getOrg(orgId)
@@ -110,9 +105,8 @@ roleRouter.put('/:id', jsonParser, (req, res) => {
           'capabilities']);
     })
     .then( result => {
-      retObj = Object.assign( {}, result[0], {
-        organization: orgName
-      });
+      retObj = result[0];
+      retObj.organization = orgName;
       res.json(retObj);
     })
     .catch( err => {

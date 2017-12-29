@@ -74,25 +74,33 @@ epDbHelp.convertCase = function(caseObj, mode) {
 };
 
 const expFields = {
-  roles: [
-    'idUserAdding',
-    'idUserReceiving',
-    'capabilities'
-  ]
+  roles: {
+    capabilities: null,
+    id: null,
+    id_user_adding: 'idUserAdding',
+    idUserAdding: 'id_user_adding',
+    id_user_receiving: 'idUserReceiving',
+    idUserReceiving: 'id_user_receiving',
+    organization: null
+  }
+};
 
-}
-
-epDbHelp.clearUnexpFields = function(inObj, reqTy) {
-  console.log('called helper');
+epDbHelp.scrubFields = function(inObj, reqTy) {
   const fieldsTbl = expFields[reqTy];
-  for (field in inObj) {
-    if(!fieldsTbl.includes(field)) {
+  for (const field in inObj) {
+
+    if(!(field in fieldsTbl)) {
       delete inObj[field];
     }
+
+    if(fieldsTbl[field]) {
+      inObj[fieldsTbl[field]] = inObj[field];
+      delete inObj[field];
+    }
+
   }
-  console.log
   return inObj;
-}
+};
 
 
 
