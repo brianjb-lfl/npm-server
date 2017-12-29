@@ -7,6 +7,7 @@ const roleRouter = express.Router();
 const bodyParser = require('body-parser');
 const jsonParser = bodyParser.json();
 const { epHelp } = require('./router-helpers');
+const { epDbHelp } = require('./router-db-helpers');
 
 process.stdout.write('\x1Bc');
 
@@ -18,12 +19,22 @@ roleRouter.get('/testify/', (req, res) => {
   res.status(200).json({message: 'Good to go'});
 });
 
+// new function test
+roleRouter.post('/helpertest/', (req, res) => {
+  const modObj = epDbHelp.clearUnexpFields(req.body, 'roles');
+  res.status(200).json(modObj);  
+});
+
 // POST api/roles
 roleRouter.post('/', jsonParser, (req, res) => {
   const knex = require('../db');
   let rolePostObj = {};
   let retObj = {};
   let orgName;
+
+// clear unexpected fields, convert case
+//rolePostObj = epDbHelp.
+
 
   // validate capability
   const capabilityOpts = ['admin', 'following'];
