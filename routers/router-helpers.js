@@ -173,6 +173,9 @@ epHelp.getExtUserInfo = function(usrId) {
           'narrative',
           'timestamp_start as timestampStart',
           'timestamp_end as timestampEnd',
+          'location_city as locationCity',
+          'location_state as locationState',
+          'location_country as locationCountry',
           'link')
         .orderBy('timestamp_start');
     })
