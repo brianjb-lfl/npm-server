@@ -102,6 +102,4 @@ epDbHelp.scrubFields = function(inObj, reqTy) {
   return inObj;
 };
 
-
-
 module.exports = { epDbHelp };
