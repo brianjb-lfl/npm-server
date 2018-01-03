@@ -133,7 +133,14 @@ epHelp.getExtUserInfo = function(usrId) {
     .join('users', 'roles.id_user_adding', '=', 'users.id')
     .where('capabilities', '=', 'admin')
     .andWhere('id_user_receiving', '=', usrId)
-    .select('users.id', 'users.organization')
+    .select(
+      'roles.id as id',
+      'id_user_adding as idUserAdding',
+      'id_user_receiving as idUserReceiving',
+      'users.first_name as firstName',
+      'users.last_name as lastName',
+      'users.organization',
+      'capabilities')
     .then( adminOfs => {
       adminOfArr = adminOfs.slice();
 
@@ -143,9 +150,13 @@ epHelp.getExtUserInfo = function(usrId) {
         .where('capabilities', '=', 'admin')
         .andWhere('id_user_adding', '=', usrId)
         .select(
-          'users.id',
+          'roles.id as id',
+          'id_user_adding as idUserAdding',
+          'id_user_receiving as idUserReceiving',
           'users.first_name as firstName',
-          'users.last_name as lastName');
+          'users.last_name as lastName',
+          'users.organization',
+          'capabilities');
     })
     .then( admins => {
       adminsArr = admins.slice();
@@ -156,8 +167,13 @@ epHelp.getExtUserInfo = function(usrId) {
         .where('capabilities', '=', 'following')
         .andWhere('id_user_adding', '=', usrId)
         .select(
-          'users.id',
-          'users.organization');
+          'roles.id as id',
+          'id_user_adding as idUserAdding',
+          'id_user_receiving as idUserReceiving',
+          'users.first_name as firstName',
+          'users.last_name as lastName',
+          'users.organization',
+          'capabilities');
     })
     .then( follows => {
       followsArr = follows.slice();
