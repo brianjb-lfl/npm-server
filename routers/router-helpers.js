@@ -263,11 +263,12 @@ epHelp.buildOppList = function() {
 epHelp.buildOpp = function(inOppId) {
 
   let causeArr = [];
+  let respArr = [];
   let oppObj = {};
   let resObj = {};
   let oppOrg;
   const knex = require('../db');
-
+  // get causes
   return knex('opportunities_causes')
     .join('causes', 'opportunities_causes.id_cause', '=', 'causes.id')
     .select('causes.cause')
@@ -275,6 +276,27 @@ epHelp.buildOpp = function(inOppId) {
     .orderBy('causes.cause')
     .then( results => {
       causeArr = results.map( cause => cause.cause);
+      // get responses
+      return knex('responses')
+        .join('users', 'responses.id_user', '=', 'users.id')
+        .select(
+          'responses.id',
+          'responses.id_user as userId',
+          'responses.id_opp as idOpportunity',
+          'responses.response_status as responseStatus',
+          'responses.timestamp_status_change as timestampStatusChange',
+          'responses.timestamp_created as timestampCreated',
+          'responses.notes',
+          'users.organization',
+          'users.first_name as firstName',
+          'users.last_name as lastName'
+        )
+        .where('responses.id_opp', '=', inOppId)
+        .debug(false);
+    })
+    .then( responses => {
+      respArr = responses.slice();
+      // get opp info
       return knex('opportunities')
         .join('users', 'opportunities.id_user', '=', 'users.id')
         .select(
@@ -302,7 +324,8 @@ epHelp.buildOpp = function(inOppId) {
     .then( result => {
       resObj = Object.assign( {}, oppObj, {
         organization: result,
-        causes: causeArr
+        causes: causeArr,
+        responses: respArr
       });
       return resObj;
     });
