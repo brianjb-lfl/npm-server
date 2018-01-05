@@ -229,13 +229,13 @@ epHelp.getExtUserInfo = function(usrId) {
     });
 };
 
-epHelp.buildOppIDs = function(inObj) {
+epHelp.buildOppIDs = function(inParamObj) {
 
   let whereStr = '';
   let qObj = {};
 
-  if(Object.keys(inObj).length > 0) {
-    const qObj = this.convertCase(inObj, 'ccToSnake');
+  if(Object.keys(inParamObj).length > 0) {
+    const qObj = this.convertCase(inParamObj, 'ccToSnake');
     whereStr = 'WHERE ';
     Object.keys(qObj).forEach( key => {
       whereStr += "(" + key + " LIKE '%" + qObj[key] + "%') AND ";
@@ -252,12 +252,11 @@ epHelp.buildOppIDs = function(inObj) {
       const oppIdArr = results.rows.map( opp => opp.id);
       return oppIdArr;
     });
-
 };
 
-epHelp.buildOppList = function(inQObj) {
+epHelp.buildOppList = function(inQryObj) {
   let whereArr = [];
-  return this.buildOppIDs(inQObj)
+  return this.buildOppIDs(inQryObj)
     .then( results => {
       whereArr = results;
     })

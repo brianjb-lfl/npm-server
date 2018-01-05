@@ -89,7 +89,7 @@ roleRouter.put('/:id', jsonParser, (req, res) => {
     });
   }
 
-  let orgId = rolePutObj.capabilities === 'admin' ? 
+  let orgId = ['admin', 'delete'].includes(rolePutObj.capabilities) ? 
     rolePutObj.id_user_adding : rolePutObj.id_user_receiving;
   return epHelp.getOrg(orgId)
     .then( org => {
