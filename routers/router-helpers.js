@@ -133,31 +133,47 @@ epHelp.getExtUserInfo = function(usrId) {
     .join('users', 'roles.id_user_adding', '=', 'users.id')
     .where('capabilities', '=', 'admin')
     .andWhere('id_user_receiving', '=', usrId)
-    .select('users.id', 'users.organization')
+    .select(
+      'roles.id as id',
+      'id_user_adding as idUserAdding',
+      'id_user_receiving as idUserReceiving',
+      'users.first_name as firstName',
+      'users.last_name as lastName',
+      'users.organization',
+      'capabilities'
+    )
     .then( adminOfs => {
       adminOfArr = adminOfs.slice();
-
       // admins
       return knex('roles')
         .join('users', 'roles.id_user_receiving', '=', 'users.id')
         .where('capabilities', '=', 'admin')
         .andWhere('id_user_adding', '=', usrId)
         .select(
-          'users.id',
+          'roles.id as id',
+          'id_user_adding as idUserAdding',
+          'id_user_receiving as idUserReceiving',
           'users.first_name as firstName',
-          'users.last_name as lastName');
+          'users.last_name as lastName',
+          'users.organization',
+          'capabilities'
+        );
     })
     .then( admins => {
       adminsArr = admins.slice();
-
       // following
       return knex('roles')
         .join('users', 'roles.id_user_receiving', '=', 'users.id')
         .where('capabilities', '=', 'following')
         .andWhere('id_user_adding', '=', usrId)
         .select(
-          'users.id',
-          'users.organization');
+          'roles.id as id',
+          'id_user_adding as idUserAdding',
+          'id_user_receiving as idUserReceiving',
+          'users.first_name as firstName',
+          'users.last_name as lastName',
+          'users.organization',
+          'capabilities');
     })
     .then( follows => {
       followsArr = follows.slice();
@@ -180,8 +196,20 @@ epHelp.getExtUserInfo = function(usrId) {
         .orderBy('timestamp_start');
     })
     .then( opps => {
-      oppsArr = opps.slice();
-
+      oppsArr = [...opps];
+      const causePromisesArray = opps.map((opp,index)=>{
+        return knex('opportunities_causes')
+          .join('causes', 'opportunities_causes.id_cause', '=', 'causes.id')
+          .select('causes.cause')
+          .where('opportunities_causes.id_opp', '=', opp.id)
+          .orderBy('causes.cause')
+          .then( causes => {
+            oppsArr[index].causes = causes.map( cause => cause.cause);
+          });
+      });
+      return Promise.all(causePromisesArray);
+    })
+    .then(()=>{
       // responses
       return knex('responses')
         .join('opportunities', 'responses.id_opp', '=', 'opportunities.id')
