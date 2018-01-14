@@ -139,11 +139,15 @@ epHelp.getExtUserInfo = function(usrId) {
       'id_user_receiving as idUserReceiving',
       'users.first_name as firstName',
       'users.last_name as lastName',
+      'users.logo',
+      'users.location_city as locationCity',
+      'users.location_state as locationState',
       'users.organization',
       'capabilities'
     )
     .then( adminOfs => {
       adminOfArr = adminOfs.slice();
+
       // admins
       return knex('roles')
         .join('users', 'roles.id_user_receiving', '=', 'users.id')
@@ -155,12 +159,16 @@ epHelp.getExtUserInfo = function(usrId) {
           'id_user_receiving as idUserReceiving',
           'users.first_name as firstName',
           'users.last_name as lastName',
+          'users.logo as logo',
+          'users.location_city as locationCity',
+          'users.location_state as locationState',
           'users.organization',
-          'capabilities'
+          'capabilities',
         );
     })
     .then( admins => {
       adminsArr = admins.slice();
+
       // following
       return knex('roles')
         .join('users', 'roles.id_user_receiving', '=', 'users.id')
@@ -172,6 +180,9 @@ epHelp.getExtUserInfo = function(usrId) {
           'id_user_receiving as idUserReceiving',
           'users.first_name as firstName',
           'users.last_name as lastName',
+          'users.logo as logo',
+          'users.location_city as locationCity',
+          'users.location_state as locationState',
           'users.organization',
           'capabilities');
     })
@@ -229,7 +240,29 @@ epHelp.getExtUserInfo = function(usrId) {
         .orderBy('responses.timestamp_created');
     })
     .then( responses => {
-      respArr = responses.slice();
+      respArr = [...responses];
+      const responsePromisesArray = responses.map((response,index)=>{
+        return knex('opportunities')
+          .join('users', 'opportunities.id_user', '=', 'users.id')
+          .select(
+            'users.organization',
+            'users.user_type as userType',
+            'users.first_name as firstName',
+            'users.last_name as lastName',
+            'users.logo',
+          )
+          .where('opportunities.id', '=', response.idOpportunity)
+          .then( user => {
+            respArr[index].organization = user[0].organization;
+            respArr[index].firstName = user[0].firstName;
+            respArr[index].lastName = user[0].lastName;
+            respArr[index].userType = user[0].userType;
+            respArr[index].logo = user[0].logo;
+          });
+      });
+      return Promise.all(responsePromisesArray);
+    })
+    .then(()=>{
       resObj = Object.assign( {}, {
         adminOf: adminOfArr,
         admins: adminsArr,
