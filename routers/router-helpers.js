@@ -233,10 +233,17 @@ epHelp.getExtUserInfo = function(usrId) {
           'response_status as responseStatus',
           'responses.timestamp_status_change as timestampStatusChange',
           'responses.timestamp_created as timestampCreated',
+          'opportunities.narrative',
           'opportunities.title',
+          'opportunities.offer',
+          'opportunities.opportunity_type as opportunityType',
+          'opportunities.link',
           'opportunities.location_city as locationCity',
           'opportunities.location_state as locationState',
-          'opportunities.location_country as locationCountry')
+          'opportunities.location_country as locationCountry',
+          'opportunities.timestamp_start as timestampStart',
+          'opportunities.timestamp_end as timestampEnd'
+        )
         .orderBy('responses.timestamp_created');
     })
     .then( responses => {
