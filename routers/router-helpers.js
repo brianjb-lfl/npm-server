@@ -221,6 +221,30 @@ epHelp.getExtUserInfo = function(usrId) {
       return Promise.all(causePromisesArray);
     })
     .then(()=>{
+      const oppResponsePromisesArray = oppsArr.map((opp,index)=>{
+        return knex('responses')
+          .join('users', 'responses.id_user', '=', 'users.id')
+          .select( 
+            'responses.id as id',
+            'id_user as userId',
+            'id_opp as idOpportunity',
+            'response_status as responseStatus',
+            'timestamp_status_change as timestampStatusChange',
+            'responses.timestamp_created as timestampCreated',
+            'notes',
+            'users.first_name as firstName',
+            'users.last_name as lastName',
+            'users.organization'
+          )
+          .where('id_opp', '=', opp.id)
+          .then( responses => {
+            console.log('responses',responses)
+            oppsArr[index].responses = responses;
+          });
+      });
+      return Promise.all(oppResponsePromisesArray);
+    })
+    .then(()=>{
       // responses
       return knex('responses')
         .join('opportunities', 'responses.id_opp', '=', 'opportunities.id')
