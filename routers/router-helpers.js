@@ -114,7 +114,7 @@ epHelp.buildUser = function (userId) {
       return usrObj;
     })
     .catch( err => {
-      return {err: 500, message: 'Internal server error'};
+      return {err: 500, message: `Internal server error: ${err}`};
     });
 };
 
@@ -210,7 +210,9 @@ epHelp.getExtUserInfo = function(usrId) {
     })
     .then( opps => {
       oppsArr = [...opps];
-      console.log('opps found', typeof oppsArr[0].timestampEnd, oppsArr[0].timestampEnd, typeof oppsArr[0].timestampStart, oppsArr[0].timestampStart);
+      // if (oppsArr[0]) {
+        // console.log('opps found', typeof oppsArr[0].timestampEnd, oppsArr[0].timestampEnd, typeof oppsArr[0].timestampStart, oppsArr[0].timestampStart);
+      // }
       const causePromisesArray = opps.map((opp,index)=>{
         return knex('opportunities_causes')
           .join('causes', 'opportunities_causes.id_cause', '=', 'causes.id')
@@ -569,7 +571,7 @@ epHelp.buildOppCausesArr = function(oppId, inCausesArr) {
     })
 
     .catch( err => {
-      return {err: 500, message: 'Internal server error'};
+      return {err: 500, message: `Internal server error: ${err}`};
     });
 };
 

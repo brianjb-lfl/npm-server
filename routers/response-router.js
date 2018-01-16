@@ -47,7 +47,7 @@ responseRouter.post('/', jsonParser, (req, res) => {
       if(err.reason === 'ValidationError') {
         return res.status(err.code).json(err);
       }
-      res.status(500).json({message: 'Internal server error'});
+      res.status(500).json({message: `Internal server error: ${err}`});
     });
 });
 
@@ -91,7 +91,7 @@ responseRouter.put('/:id', jsonParser, (req, res) => {
       if(err.reason === 'ValidationError') {
         return res.status(err.code).json(err);
       }
-      res.status(500).json({message: 'Internal server error'});
+      res.status(500).json({message: `Internal server error: ${err}`});
     });
 });
 
@@ -105,7 +105,7 @@ responseRouter.delete('/:id', (req, res) => {
       res.status(200).json({message: 'Response deleted'});
     })
     .catch( err => {
-      res.status(500).json({message: 'Internal server error'});
+      res.status(500).json({message: `Internal server error: ${err}`});
     });
 });
 

@@ -30,7 +30,7 @@ userRouter.get('/list', (req, res) => {
     })
 
     .catch( err => {
-      res.status(500).json({message: 'Internal server error'});
+      res.status(500).json({message: `Internal server error: ${err}`});
     });    
 });
 
@@ -50,7 +50,7 @@ userRouter.get('/:id', (req, res) => {
       res.json(respObj);
     })
     .catch( err => {
-      res.status(500).json({message: 'Internal server error'});
+      res.status(500).json({message: `Internal server error: ${err}`});
     });
 });
 
@@ -117,7 +117,7 @@ userRouter.post('/register', jsonParser, (req, res) => {
       if(err.reason === 'ValidationError') {
         return res.status(err.code).json(err);
       }
-      res.status(500).json({message: 'Internal server error'});
+      res.status(500).json({message: `Internal server error: ${err}`});
     });
 });
 
@@ -281,7 +281,7 @@ userRouter.put('/:id', jsonParser, (req, res) => {
       if(err.reason === 'ValidationError') {
         return res.status(err.code).json(err);
       }
-      res.status(500).json({message: 'Internal server error'});
+      res.status(500).json({message: `Internal server error: ${err}`});
     });
 });
 
@@ -300,7 +300,7 @@ userRouter.delete('/clear/test/data', (req, res) => {
         });
     })
     .catch( err => {
-      res.status(500).json({message: 'Internal server error'});
+      res.status(500).json({message: `Internal server error: ${err}`});
     });
 });
 

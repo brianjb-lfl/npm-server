@@ -37,7 +37,7 @@ oppRouter.get('/list', (req, res) => {
       res.json(results);
     })
     .catch( err => {
-      res.status(500).json({message: 'Internal server error'});
+      res.status(500).json({message: `Internal server error: ${err}`});
     });
 
 });
@@ -50,7 +50,7 @@ oppRouter.get('/:id', (req, res) => {
       res.json(results);
     })
     .catch( err => {
-      res.status(500).json({message: 'Internal server error'});
+      res.status(500).json({message: `Internal server error: ${err}`});
     });
 });
 
@@ -102,7 +102,7 @@ oppRouter.post('/', jsonParser, (req, res) => {
           if(err.reason === 'ValidationError') {
             return res.status(err.code).json(err);
           }
-          res.status(500).json({message: 'Internal server error'});
+          res.status(500).json({message: `Internal server error: ${err}`});
         });
     });
 });
@@ -165,7 +165,7 @@ oppRouter.put('/:id', jsonParser, (req, res) => {
               if(err.reason === 'ValidationError') {
                 return res.status(err.code).json(err);
               }
-              res.status(500).json({message: 'Internal server error'});
+              res.status(500).json({message: `Internal server error: ${err}`});
             });
         });
     });
