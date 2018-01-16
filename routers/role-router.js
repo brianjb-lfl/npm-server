@@ -70,7 +70,6 @@ roleRouter.post('/', jsonParser, (req, res) => {
 
 // PUT api/roles/:id
 roleRouter.put('/:id', jsonParser, (req, res) => {
-  console.log(req.body);
   const knex = require('../db');
   const roleId = req.params.id;
   let retObj = {};
@@ -89,8 +88,11 @@ roleRouter.put('/:id', jsonParser, (req, res) => {
     });
   }
 
-  let orgId = ['admin', 'delete'].includes(rolePutObj.capabilities) ? 
-    rolePutObj.id_user_adding : rolePutObj.id_user_receiving;
+  let orgId = rolePutObj.capabilities === 'admin' ? 
+    rolePutObj.id_user_adding : 
+    (rolePutObj.capabilities === 'delete' ?
+      rolePutObj.id_user_adding :rolePutObj.id_user_receiving);
+
   return epHelp.getOrg(orgId)
     .then( org => {
       orgName = org;

@@ -117,17 +117,13 @@ CREATE TABLE roles (
 CREATE TABLE responses (
   id serial primary key,
   id_user integer references users on delete cascade,
-  id_opportunity integer references opportunities on delete cascade,
+  id_opp integer references opportunities on delete cascade,
   -- status pending, accepted, completed, deleted, denied
   response_status text default 'pending',
   -- timestamp_status_change = most recent status change
   timestamp_status_change timestamp,
   timestamp_created timestamp default current_timestamp,
-  -- fields below are copies of data at time of entry
-  organization text,
-  firstName text,
-  lastName text,
-  title text,
+  notes text
 );
 
 -- @@@@@@@@@@@ END CREATE TABLE, START INSERT INTO @@@@@@@@@@@

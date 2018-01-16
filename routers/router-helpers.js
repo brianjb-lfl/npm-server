@@ -139,8 +139,13 @@ epHelp.getExtUserInfo = function(usrId) {
       'id_user_receiving as idUserReceiving',
       'users.first_name as firstName',
       'users.last_name as lastName',
+      'users.logo',
+      'users.location_city as locationCity',
+      'users.location_state as locationState',
       'users.organization',
-      'capabilities')
+      'capabilities'
+    )
+
     .then( adminOfs => {
       adminOfArr = adminOfs.slice();
 
@@ -155,8 +160,13 @@ epHelp.getExtUserInfo = function(usrId) {
           'id_user_receiving as idUserReceiving',
           'users.first_name as firstName',
           'users.last_name as lastName',
+          'users.logo as logo',
+          'users.location_city as locationCity',
+          'users.location_state as locationState',
           'users.organization',
-          'capabilities');
+          'capabilities'
+        );
+
     })
     .then( admins => {
       adminsArr = admins.slice();
@@ -172,6 +182,9 @@ epHelp.getExtUserInfo = function(usrId) {
           'id_user_receiving as idUserReceiving',
           'users.first_name as firstName',
           'users.last_name as lastName',
+          'users.logo as logo',
+          'users.location_city as locationCity',
+          'users.location_state as locationState',
           'users.organization',
           'capabilities');
     })
@@ -196,8 +209,44 @@ epHelp.getExtUserInfo = function(usrId) {
         .orderBy('timestamp_start');
     })
     .then( opps => {
-      oppsArr = opps.slice();
-
+      oppsArr = [...opps];
+      console.log('opps found', typeof oppsArr[0].timestampEnd, oppsArr[0].timestampEnd, typeof oppsArr[0].timestampStart, oppsArr[0].timestampStart);
+      const causePromisesArray = opps.map((opp,index)=>{
+        return knex('opportunities_causes')
+          .join('causes', 'opportunities_causes.id_cause', '=', 'causes.id')
+          .select('causes.cause')
+          .where('opportunities_causes.id_opp', '=', opp.id)
+          .orderBy('causes.cause')
+          .then( causes => {
+            oppsArr[index].causes = causes.map( cause => cause.cause);
+          });
+      });
+      return Promise.all(causePromisesArray);
+    })
+    .then(()=>{
+      const oppResponsePromisesArray = oppsArr.map((opp,index)=>{
+        return knex('responses')
+          .join('users', 'responses.id_user', '=', 'users.id')
+          .select( 
+            'responses.id as id',
+            'id_user as userId',
+            'id_opp as idOpportunity',
+            'response_status as responseStatus',
+            'timestamp_status_change as timestampStatusChange',
+            'responses.timestamp_created as timestampCreated',
+            'notes',
+            'users.first_name as firstName',
+            'users.last_name as lastName',
+            'users.organization'
+          )
+          .where('id_opp', '=', opp.id)
+          .then( responses => {
+            oppsArr[index].responses = responses;
+          });
+      });
+      return Promise.all(oppResponsePromisesArray);
+    })
+    .then(()=>{
       // responses
       return knex('responses')
         .join('opportunities', 'responses.id_opp', '=', 'opportunities.id')
@@ -210,14 +259,43 @@ epHelp.getExtUserInfo = function(usrId) {
           'response_status as responseStatus',
           'responses.timestamp_status_change as timestampStatusChange',
           'responses.timestamp_created as timestampCreated',
+          'opportunities.narrative',
           'opportunities.title',
+          'opportunities.offer',
+          'opportunities.opportunity_type as opportunityType',
+          'opportunities.link',
           'opportunities.location_city as locationCity',
           'opportunities.location_state as locationState',
-          'opportunities.location_country as locationCountry')
+          'opportunities.location_country as locationCountry',
+          'opportunities.timestamp_start as timestampStart',
+          'opportunities.timestamp_end as timestampEnd'
+        )
         .orderBy('responses.timestamp_created');
     })
     .then( responses => {
-      respArr = responses.slice();
+      respArr = [...responses];
+      const responsePromisesArray = responses.map((response,index)=>{
+        return knex('opportunities')
+          .join('users', 'opportunities.id_user', '=', 'users.id')
+          .select(
+            'users.organization',
+            'users.user_type as userType',
+            'users.first_name as firstName',
+            'users.last_name as lastName',
+            'users.logo'
+          )
+          .where('opportunities.id', '=', response.idOpportunity)
+          .then( user => {
+            respArr[index].organization = user[0].organization;
+            respArr[index].firstName = user[0].firstName;
+            respArr[index].lastName = user[0].lastName;
+            respArr[index].userType = user[0].userType;
+            respArr[index].logo = user[0].logo;
+          });
+      });
+      return Promise.all(responsePromisesArray);
+    })
+    .then(()=>{
       resObj = Object.assign( {}, {
         adminOf: adminOfArr,
         admins: adminsArr,
@@ -431,8 +509,38 @@ epHelp.getTitle = function(inOppId) {
 
 epHelp.buildOppBase = function(inOppObj) {
 
-  let retBaseObj = this.convertCase(inOppObj, 'ccToSnake');
-  delete retBaseObj.causes;
+  const {id,
+    timestampCreated, 
+    organization,
+    opportunityType,
+    offer, 
+    title,
+    narrative,
+    timestampStart,
+    timestampEnd,
+    locationCity, 
+    locationState,
+    locationCountry,
+    userId,
+    link
+  } = inOppObj;
+  const opportunity = {
+    id,
+    timestampCreated, 
+    organization,
+    opportunityType,
+    offer, 
+    title,
+    narrative,
+    timestampStart,
+    timestampEnd,
+    locationCity, 
+    locationState,
+    locationCountry,
+    userId,
+    link
+  };
+  let retBaseObj = this.convertCase(opportunity, 'ccToSnake');
 
   return retBaseObj;
 };
