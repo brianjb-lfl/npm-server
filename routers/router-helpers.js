@@ -163,7 +163,7 @@ epHelp.getExtUserInfo = function(usrId) {
           'users.location_city as locationCity',
           'users.location_state as locationState',
           'users.organization',
-          'capabilities',
+          'capabilities'
         );
     })
     .then( admins => {
@@ -208,6 +208,7 @@ epHelp.getExtUserInfo = function(usrId) {
     })
     .then( opps => {
       oppsArr = [...opps];
+      console.log('opps found', typeof oppsArr[0].timestampEnd, oppsArr[0].timestampEnd, typeof oppsArr[0].timestampStart, oppsArr[0].timestampStart);
       const causePromisesArray = opps.map((opp,index)=>{
         return knex('opportunities_causes')
           .join('causes', 'opportunities_causes.id_cause', '=', 'causes.id')
@@ -238,7 +239,6 @@ epHelp.getExtUserInfo = function(usrId) {
           )
           .where('id_opp', '=', opp.id)
           .then( responses => {
-            console.log('responses',responses)
             oppsArr[index].responses = responses;
           });
       });
@@ -280,7 +280,7 @@ epHelp.getExtUserInfo = function(usrId) {
             'users.user_type as userType',
             'users.first_name as firstName',
             'users.last_name as lastName',
-            'users.logo',
+            'users.logo'
           )
           .where('opportunities.id', '=', response.idOpportunity)
           .then( user => {
@@ -453,8 +453,38 @@ epHelp.getTitle = function(inOppId) {
 
 epHelp.buildOppBase = function(inOppObj) {
 
-  let retBaseObj = this.convertCase(inOppObj, 'ccToSnake');
-  delete retBaseObj.causes;
+  const {id,
+    timestampCreated, 
+    organization,
+    opportunityType,
+    offer, 
+    title,
+    narrative,
+    timestampStart,
+    timestampEnd,
+    locationCity, 
+    locationState,
+    locationCountry,
+    userId,
+    link
+  } = inOppObj;
+  const opportunity = {
+    id,
+    timestampCreated, 
+    organization,
+    opportunityType,
+    offer, 
+    title,
+    narrative,
+    timestampStart,
+    timestampEnd,
+    locationCity, 
+    locationState,
+    locationCountry,
+    userId,
+    link
+  };
+  let retBaseObj = this.convertCase(opportunity, 'ccToSnake');
 
   return retBaseObj;
 };

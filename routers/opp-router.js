@@ -104,6 +104,7 @@ oppRouter.post('/', jsonParser, (req, res) => {
 // PUT api/opportunities/:id
 oppRouter.put('/:id', jsonParser, (req, res) => {
   let inOppObj = req.body;
+  console.log('timestamp',typeof inOppObj.timestampEnd, inOppObj.timestampEnd);
   if(inOppObj.id) { delete inOppObj.id; } 
   let oppId = req.params.id;
   let retObj = {};
@@ -123,7 +124,6 @@ oppRouter.put('/:id', jsonParser, (req, res) => {
 
   // update base opportunity info'
   const postOppObj = epHelp.buildOppBase(inOppObj);
-  console.log(postOppObj);
   const knex = require('../db');
 
   return knex('opportunities')
@@ -132,8 +132,6 @@ oppRouter.put('/:id', jsonParser, (req, res) => {
     .returning(['id', 'opportunity_type as opportunityType', 'narrative', 'location_city', 'location_state'])
 
     .then( results => {
-      console.log('results');
-      console.log(results);
       return knex('opportunities_causes')
         .where('id_opp', '=', oppId)
         .del()
@@ -154,8 +152,6 @@ oppRouter.put('/:id', jsonParser, (req, res) => {
           return epHelp.buildOpp(oppId)
             .then( result => {
               retObj = Object.assign( {}, result);
-              console.log('retObj');
-              console.log(retObj);
               res.status(201).json(retObj);      
             })
             .catch( err => {
