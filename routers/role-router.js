@@ -33,7 +33,7 @@ roleRouter.post('/', jsonParser, (req, res) => {
   let rolePostObj = epDbHelp.scrubFields(req.body, 'roles');
 
   // validate capability
-  const capabilityOpts = ['admin', 'following'];
+  const capabilityOpts = ['admin', 'following', 'delete'];
   if(!(capabilityOpts.includes(req.body.capabilities))) {
     return res.status(422).json({
       code: 422,
@@ -92,6 +92,7 @@ roleRouter.put('/:id', jsonParser, (req, res) => {
     rolePutObj.id_user_adding : 
     (rolePutObj.capabilities === 'delete' ?
       rolePutObj.id_user_adding :rolePutObj.id_user_receiving);
+
   return epHelp.getOrg(orgId)
     .then( org => {
       orgName = org;

@@ -145,6 +145,7 @@ epHelp.getExtUserInfo = function(usrId) {
       'users.organization',
       'capabilities'
     )
+
     .then( adminOfs => {
       adminOfArr = adminOfs.slice();
 
@@ -165,6 +166,7 @@ epHelp.getExtUserInfo = function(usrId) {
           'users.organization',
           'capabilities'
         );
+
     })
     .then( admins => {
       adminsArr = admins.slice();
@@ -305,61 +307,93 @@ epHelp.getExtUserInfo = function(usrId) {
     });
 };
 
-epHelp.buildOppList = function() {
+epHelp.buildOppIDs = function(inParamObj) {
 
-  let causeArr = [];
-  let resArr = [];
+  let whereStr = '';
+  let qObj = {};
+
+  if(Object.keys(inParamObj).length > 0) {
+    const qObj = this.convertCase(inParamObj, 'ccToSnake');
+    whereStr = 'WHERE ';
+    Object.keys(qObj).forEach( key => {
+      whereStr += "(" + key + " LIKE '%" + qObj[key] + "%') AND ";
+    });
+  }
+
+  whereStr = whereStr.substring(0, whereStr.length - 5);
+
+  const rawSQL = "SELECT id FROM opportunities " + whereStr;
   const knex = require('../db');
-  return knex('opportunities_causes')
-    .join('causes', 'opportunities_causes.id_cause', '=', 'causes.id')
-    .select('causes.id', 'opportunities_causes.id_opp', 'causes.cause')
-    .orderBy('causes.cause')
-    .then( results => causeArr = results.slice())
+  return knex
+    .raw(rawSQL)  
+    .then( results => {
+      const oppIdArr = results.rows.map( opp => opp.id);
+      return oppIdArr;
+    });
+};
+
+epHelp.buildOppList = function(inQryObj) {
+  let whereArr = [];
+  return this.buildOppIDs(inQryObj)
+    .then( results => {
+      whereArr = results;
+    })
     .then( () => {
-      return knex('opportunities')
-        .join('users', 'opportunities.id_user', '=', 'users.id')
-        .select(
-          'opportunities.id',
-          'id_user',
-          'users.organization',
-          'opportunity_type',
-          'offer',
-          'title',
-          'narrative',
-          'timestamp_start',
-          'timestamp_end',
-          'users.location_city',
-          'users.location_state',
-          'users.location_country',
-          'link'
-        )
-        .orderBy('timestamp_start')
-        .debug(false)
-        .then( results => {
-          results.forEach ( opp => {
-            const tempCauses = causeArr
-              .filter( cause => cause.id_opp === opp.id)
-              .map( cause => cause.cause);
-            let tempOpp = epHelp.convertCase(opp, 'snakeToCC');
-            tempOpp = Object.assign( {}, tempOpp, {
-              causes: tempCauses
+      let causeArr = [];
+      let resArr = [];
+      const knex = require('../db');
+      return knex('opportunities_causes')
+        .join('causes', 'opportunities_causes.id_cause', '=', 'causes.id')
+        .select('causes.id', 'opportunities_causes.id_opp', 'causes.cause')
+        .orderBy('causes.cause')
+        .then( results => causeArr = results.slice())
+        .then( () => {
+          return knex('opportunities')
+            .join('users', 'opportunities.id_user', '=', 'users.id')
+            .select(
+              'opportunities.id',
+              'id_user',
+              'users.organization',
+              'opportunity_type',
+              'offer',
+              'title',
+              'narrative',
+              'timestamp_start',
+              'timestamp_end',
+              'users.location_city',
+              'users.location_state',
+              'users.location_country',
+              'link'
+            )
+            .whereIn('opportunities.id', whereArr)
+            .orderBy('timestamp_start')
+            .debug(false)
+            .then( results => {
+              results.forEach ( opp => {
+                const tempCauses = causeArr
+                  .filter( cause => cause.id_opp === opp.id)
+                  .map( cause => cause.cause);
+                let tempOpp = epHelp.convertCase(opp, 'snakeToCC');
+                tempOpp = Object.assign( {}, tempOpp, {
+                  causes: tempCauses
+                });
+                resArr.push(tempOpp);
+              });
+              return resArr;
             });
-            resArr.push(tempOpp);
-          });
-          return resArr;
         });
     });
-
 };
 
 epHelp.buildOpp = function(inOppId) {
 
   let causeArr = [];
+  let respArr = [];
   let oppObj = {};
   let resObj = {};
   let oppOrg;
   const knex = require('../db');
-
+  // get causes
   return knex('opportunities_causes')
     .join('causes', 'opportunities_causes.id_cause', '=', 'causes.id')
     .select('causes.cause')
@@ -367,6 +401,27 @@ epHelp.buildOpp = function(inOppId) {
     .orderBy('causes.cause')
     .then( results => {
       causeArr = results.map( cause => cause.cause);
+      // get responses
+      return knex('responses')
+        .join('users', 'responses.id_user', '=', 'users.id')
+        .select(
+          'responses.id',
+          'responses.id_user as userId',
+          'responses.id_opp as idOpportunity',
+          'responses.response_status as responseStatus',
+          'responses.timestamp_status_change as timestampStatusChange',
+          'responses.timestamp_created as timestampCreated',
+          'responses.notes',
+          'users.organization',
+          'users.first_name as firstName',
+          'users.last_name as lastName'
+        )
+        .where('responses.id_opp', '=', inOppId)
+        .debug(false);
+    })
+    .then( responses => {
+      respArr = responses.slice();
+      // get opp info
       return knex('opportunities')
         .join('users', 'opportunities.id_user', '=', 'users.id')
         .select(
@@ -394,7 +449,8 @@ epHelp.buildOpp = function(inOppId) {
     .then( result => {
       resObj = Object.assign( {}, oppObj, {
         organization: result,
-        causes: causeArr
+        causes: causeArr,
+        responses: respArr
       });
       return resObj;
     });

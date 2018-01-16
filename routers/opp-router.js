@@ -26,13 +26,20 @@ oppRouter.get('/testify/secure', (req, res) => {
 //GET api/opportunities/list
 oppRouter.get('/list', (req, res) => {
 
-  return epHelp.buildOppList()
+  // check for query parameters
+  let qObj = {};
+  if(Object.keys(req.query).length > 0) {
+    qObj = req.query;
+  }
+
+  return epHelp.buildOppList(qObj)
     .then( results => {
       res.json(results);
     })
     .catch( err => {
       res.status(500).json({message: 'Internal server error'});
     });
+
 });
 
 //GET api/opportunities/:id
