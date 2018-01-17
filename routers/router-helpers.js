@@ -513,7 +513,6 @@ epHelp.buildOppBase = function(inOppObj) {
 
   const {id,
     timestampCreated, 
-    organization,
     opportunityType,
     offer, 
     title,
@@ -529,7 +528,6 @@ epHelp.buildOppBase = function(inOppObj) {
   const opportunity = {
     id,
     timestampCreated, 
-    organization,
     opportunityType,
     offer, 
     title,

@@ -111,7 +111,6 @@ oppRouter.post('/', jsonParser, (req, res) => {
 // PUT api/opportunities/:id
 oppRouter.put('/:id', jsonParser, (req, res) => {
   let inOppObj = req.body;
-  console.log('timestamp',typeof inOppObj.timestampEnd, inOppObj.timestampEnd);
   if(inOppObj.id) { delete inOppObj.id; } 
   let oppId = req.params.id;
   let retObj = {};
